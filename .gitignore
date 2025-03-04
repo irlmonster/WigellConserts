@@ -36,3 +36,47 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Ignorera kompilerade filer
+*.class
+
+# Maven- och Gradle-byggen
+*.jar
+*.war
+*.ear
+target/
+
+# Gradle-specifika filer
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE-specifika filer
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# OS-specifika filer
+.DS_Store
+Thumbs.db
+
+# Loggar och temp-filer
+logs/
+*.log
+
+# Miljöfiler och känslig data
+.env
+*.key
+*.crt
+*.pem
+
+# Ignorera lokala databaskonfigurationer och känsliga filer
+hibernate.cfg.xml.local
+*.h2.db
+*.mv.db
+*.sql
+
+# Ignorera Hibernate-konfiguration (om du hanterar olika miljöer manuellt)
+hibernate.cfg.xml
