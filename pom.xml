@@ -96,7 +96,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.grp5.Main</mainClass> <!-- Här anger du huvudklassen -->
+                    <mainClass>com.grp5.Main</mainClass>
                 </configuration>
                 <executions>
                     <execution>

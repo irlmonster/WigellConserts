@@ -13,6 +13,8 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
 
+
+        <!-- Här talar vi om vilka klasser i projektet som ska mappas mot motsvarande tabell i databasen -->
         <mapping class="com.grp5.entitys.Arena" />
         <mapping class="com.grp5.entitys.Concerts" />
         <mapping class="com.grp5.entitys.Addresses" />
