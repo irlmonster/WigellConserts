@@ -24,14 +24,14 @@ public class Main extends Application {
     public static void main(String[] args) {
 
 
-        String url =  "jdbc:mysql://localhost:3306/WigellConsertsDB";
+        String url =  "jdbc:mysql://localhost:3306/wigellconcertsdb";
         String username = "root"; // användarnamn till databasen
         String password = "root";   // lösenord till databasen
 
         try {
             // Steg 1: skapa anslutning
             Connection connection = DriverManager.getConnection(url, username, password);
-
+            System.out.println("Anslutningen till databasen lyckades!");
             // Steg 2: skapa ett förberett uttalande med en paramter
             String sql = "SELECT * FROM WigellConsertsDB WHERE id = ?"; //  "?" ersätts av värdet från applikationen
             PreparedStatement statement = connection.prepareStatement(sql);
