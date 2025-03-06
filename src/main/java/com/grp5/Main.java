@@ -33,19 +33,19 @@ public class Main extends Application {
             Connection connection = DriverManager.getConnection(url, username, password);
             System.out.println("Anslutningen till databasen lyckades!");
             // Steg 2: skapa ett förberett uttalande med en paramter
-            String sql = "SELECT * FROM WigellConsertsDB WHERE id = ?"; //  "?" ersätts av värdet från applikationen
+            String sql = "SELECT * FROM arena WHERE id = ?"; //  "?" ersätts av värdet från applikationen
             PreparedStatement statement = connection.prepareStatement(sql);
 
             //Ange värdet för parametern
-            int userId = 123;
-            statement.setInt(1, userId); // om vi har flera "?" så väljer den ? på index 1
+            int address_id = 3;
+            statement.setInt(1, address_id); // om vi har flera "?" så väljer den ? på index 1
 
             //Steg 3: Utför frågan och hämta resultatet
             ResultSet resultSet = statement.executeQuery();  // vi hämtar alla (*) värden där userId är 123
 
             //Steg 4: Bearbeta resultatet (logiken)
             while (resultSet.next()) {
-                int  id = resultSet.getInt("userId"); // namnet på ett table
+                int  id = resultSet.getInt("address_id"); // namnet på ett table
                 String name = resultSet.getString("name");
                 // hantera resten av resultatet här
                 System.out.println("AnvändarID: " + id + ", Namn: " + name);
