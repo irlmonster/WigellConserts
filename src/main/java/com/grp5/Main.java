@@ -1,5 +1,6 @@
 package com.grp5;
 
+import com.grp5.javaFX.FxManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -12,18 +13,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        Label label = new Label("Välkommen till Wigell Concerts!");
-        StackPane root = new StackPane(label);
-        Scene scene = new Scene(root, 400, 300);
-
-        primaryStage.setTitle("Wigell Concerts");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        new FxManager(primaryStage);
     }
 
     public static void main(String[] args) {
-
-
         String url =  "jdbc:mysql://localhost:3306/wigellconcertsdb";
         String username = "root"; // användarnamn till databasen
         String password = "root";   // lösenord till databasen
