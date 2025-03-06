@@ -1,10 +1,6 @@
 package com.grp5.entitys;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.util.List;
+import jakarta.persistence.*;
 
 import java.util.List;
 
@@ -15,7 +11,11 @@ public class WC {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
+
+    @OneToMany()
     private List<Concerts> conserts;
+
+    @OneToMany
     private List<Customer> customers;
 
     public int getId() {
