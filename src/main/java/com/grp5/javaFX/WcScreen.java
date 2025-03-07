@@ -1,21 +1,41 @@
 package com.grp5.javaFX;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class WcScreen {
 
-    // Den överordnade containern
-    private VBox root;
-    private ComboBox<String> concertDropdown;
-    private Label customerListLabel;
-    private Label concertInfoLabel;
+    private TabPane tabPane; // TabPane för alla flikar
 
     public WcScreen() {
+        tabPane = new TabPane();
+
+        // Skapa flikarna
+        Tab wcTab = new Tab("WC", wcTab());
+        Tab arenaTab = new Tab("Arena", wcArenaTab());
+        Tab concertTab = new Tab("Konsert", wcConcertTab());
+
+        // Gör så att flikarna inte kan stängas
+        wcTab.setClosable(false);
+        arenaTab.setClosable(false);
+        concertTab.setClosable(false);
+
+        // Lägg till flikarna i TabPane
+        tabPane.getTabs().addAll(wcTab, arenaTab, concertTab);
+    }
+
+    private VBox wcTab() {
+        VBox root;
+        ComboBox<String> concertDropdown;
+        Label customerListLabel;
+        Label concertInfoLabel;
+
         // Skapa en överordnad VBox med 20 pixlars mellanrum och centrerat innehåll
         VBox vboxMid= new VBox();
         vboxMid.setAlignment(Pos.CENTER);
@@ -28,6 +48,8 @@ public class WcScreen {
         VBox vbox1 = new VBox();
         VBox vbox2 = new VBox();
 
+        vbox1.setPadding(new Insets(0, 0, 0, 60)); // (top, right, bottom, left)
+        vbox2.setPadding(new Insets(0, 0, 0, 210)); // (top, right, bottom, left)
 
 
         // Lägg till innehåll i varje VBox
@@ -41,16 +63,16 @@ public class WcScreen {
         hbox.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
 
 
-        Label label2 = new Label("Välj konsert");
-        label2.setAlignment(Pos.CENTER);
+
+        // dropdown för konserter
         concertDropdown = new ComboBox<>();
         concertDropdown.setPrefWidth(150);
         concertDropdown.getItems().addAll("Arch Enemy", "TOKIO HOTEL", "Yorushika", "Stuck in the Sound", "Breaking Benjamin");
-        concertDropdown.setPromptText("Konsert....");
+        concertDropdown.setPromptText("Välj Konsert");
 
 
         // Skapa en rubrik och en användartext
-        Label headerLabel = new Label("Wigell Conserter");
+        Label headerLabel = new Label("Wigell Conserts");
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
 
         //CustumerListLabel
@@ -66,7 +88,7 @@ public class WcScreen {
         hbox.getChildren().addAll(vbox1, vbox2);
 
         // Lägg till stuff i vbox1
-        vbox1.getChildren().addAll(label2, concertDropdown, customerListLabel);
+        vbox1.getChildren().addAll(concertDropdown, customerListLabel);
 
         //Lägg till stuff i vbox2
         vbox2.getChildren().addAll(customerListLabel);
@@ -76,10 +98,38 @@ public class WcScreen {
 
         // Lägg till alla element i den överordnade VBoxen
         root.getChildren().addAll(vboxMid,hbox);
-    }
-
-    public VBox getRoot() {
         return root;
     }
-}
 
+    private VBox wcArenaTab() {
+        VBox root = new VBox(20);
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: #4682B4;"); // Grön bakgrund för Arena
+
+        Label headerLabel = new Label("Wigell Conserter - Arena");
+        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+
+        Label infoLabel = new Label("Här kan vi CRUD arenor.");
+
+        root.getChildren().addAll(headerLabel, infoLabel);
+        return root;
+    }
+
+    private VBox wcConcertTab() {
+        VBox root = new VBox(20);
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: #4682B4;"); // Röd bakgrund för Konsert
+
+        Label headerLabel = new Label("Wigell Conserter - Konsert");
+        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+
+        Label infoLabel = new Label("Här kan vi CRUD konserter.");
+
+        root.getChildren().addAll(headerLabel, infoLabel);
+        return root;
+    }
+
+    public TabPane getTabPane() {
+        return tabPane;
+    }
+}

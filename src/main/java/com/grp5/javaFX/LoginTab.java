@@ -3,68 +3,59 @@ package com.grp5.javaFX;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-
 
 public class LoginTab {
 
-
     private TextField nameField;
     private TextField passwordField;
-    private Label statusLabel;
-    private VBox root;
     private FxManager fxManager;
-
+    private Tab loginTab; // Lägger till en Tab direkt i klassen
 
     public LoginTab(FxManager fxManager) {
         this.fxManager = fxManager;
 
-        // Skapa en VBox med 20 pixlars mellanrum och centrerat innehåll
-        root = new VBox(20);
+        // Skapa en VBox för inloggningsinnehållet
+        VBox root = new VBox(20);
         root.setStyle("-fx-background-color: #4682B4;");
         root.setAlignment(Pos.CENTER);
 
         Label headerLabel = new Label("Wigell Conserter");
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
 
-        // Textruta för användarnamn
+        // Textrutor för användarnamn och lösenord
         nameField = new TextField();
         nameField.setPromptText("Användarnamn...");
         nameField.setStyle("-fx-max-width: 300px;");
 
-        // Textruta för lösenord
         passwordField = new TextField();
         passwordField.setPromptText("Lösenord...");
         passwordField.setStyle("-fx-max-width: 300px;");
 
-        // Skapa inloggningsknappen med eventhanterare
+        // Inloggningsknapp
         Button loginButton = new Button("Logga in");
-        loginButton.setOnAction(event -> fxManager.showWcScreen());
+        loginButton.setOnAction(event -> login());
 
         root.getChildren().addAll(headerLabel, nameField, passwordField, loginButton);
+
+        // Skapa en Tab och lägg in VBox som innehåll
+        loginTab = new Tab("Inloggning", root);
+        loginTab.setClosable(false); // Gör så att fliken inte kan stängas
     }
 
-
-    public void Login() {
+    private void login() {
         String username = nameField.getText();
         String password = passwordField.getText();
 
-        // Enkel kontroll
-
-       if (username.equals("Admin") && password.equals("Admin")) {
-           // byter till WcScreen
-           fxManager.showWcScreen();
-       } else {
-           System.out.println("Felaktiga inloggningsuppgifter!");
-       }
-
+        if (username.equals("Admin") && password.equals("Admin")) {
+            fxManager.showWcScreen(); // Byter till WcScreen
+        } else if (username.equals("Customer") && password.equals("Customer")) {
+            fxManager.showWcScreen(); // Byter till CustomerScreen
+        } else {
+            System.out.println("Felaktiga inloggningsuppgifter!");
+        }
     }
 
-    public VBox getContent() {
-        return root;
+    public Tab getTab() {
+        return loginTab; // Returnerar hela fliken
     }
-
-
 }
