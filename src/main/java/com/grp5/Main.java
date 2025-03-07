@@ -1,5 +1,7 @@
 package com.grp5;
 
+import com.grp5.entitys.CustomerManager;
+import com.grp5.entitys.TestFunctions;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -24,16 +26,16 @@ public class Main extends Application {
     public static void main(String[] args) {
 
 
-        String url =  "jdbc:mysql://localhost:3306/wigellconcertsdb";
+        String url =  "jdbc:mysql://localhost:3306/WigellConcertsDB";
         String username = "root"; // användarnamn till databasen
-        String password = "root";   // lösenord till databasen
+        String password = "Root";   // lösenord till databasen
 
         try {
             // Steg 1: skapa anslutning
             Connection connection = DriverManager.getConnection(url, username, password);
             System.out.println("Anslutningen till databasen lyckades!");
             // Steg 2: skapa ett förberett uttalande med en paramter
-            String sql = "SELECT * FROM WigellConsertsDB WHERE id = ?"; //  "?" ersätts av värdet från applikationen
+            String sql = "SELECT * FROM concerts WHERE id = ?"; //  "?" ersätts av värdet från applikationen
             PreparedStatement statement = connection.prepareStatement(sql);
 
             //Ange värdet för parametern
@@ -60,6 +62,13 @@ public class Main extends Application {
             e.printStackTrace();
 
         }
+
+        CustomerManager.regUser(
+                "Anna", "Svensson", "1995-08-12", "0701234567",
+                "Storgatan", "12", "Stockholm", "11122"
+        );
+        TestFunctions.printAllCustomers();
+
 
         launch(args); // Startar JavaFX-applikationen
     }
