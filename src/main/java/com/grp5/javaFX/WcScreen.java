@@ -2,10 +2,7 @@ package com.grp5.javaFX;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -106,26 +103,93 @@ public class WcScreen {
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #4682B4;"); // Grön bakgrund för Arena
 
+        VBox vbox = new VBox(10);
+        vbox.setAlignment(Pos.CENTER);
+
+
+        // Textfields
+        TextField arenanNameField = new TextField();
+        arenanNameField.setPromptText("Ange arenanamn...");
+        arenanNameField.setStyle("-fx-max-width: 300px;");
+
+        TextField arenanAddressField = new TextField();
+        arenanAddressField.setPromptText("Ange adress...");
+        arenanAddressField.setStyle("-fx-max-width: 300px;");
+
+
         Label headerLabel = new Label("Wigell Conserter - Arena");
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
 
-        Label infoLabel = new Label("Här kan vi CRUD arenor.");
+        // knappar
+        Button addButton = new Button("Lägg till");
+//        loginButton.setOnAction(event -> "hej");
 
-        root.getChildren().addAll(headerLabel, infoLabel);
+        Button updateButton = new Button("Uppdatera");
+//        loginButton.setOnAction(event -> "hej");
+
+        Button removeButton = new Button("Ta bort");
+//        loginButton.setOnAction(event -> "hej");
+
+
+        // Lägg till stuff i vbox1
+        vbox.getChildren().addAll(arenanNameField, arenanAddressField, addButton, updateButton, removeButton);
+        root.getChildren().addAll(headerLabel, vbox);
         return root;
     }
 
     private VBox wcConcertTab() {
         VBox root = new VBox(20);
         root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #4682B4;"); // Röd bakgrund för Konsert
+        root.setStyle("-fx-background-color: #4682B4;"); // Grön bakgrund för Arena
 
-        Label headerLabel = new Label("Wigell Conserter - Konsert");
+        VBox vbox = new VBox(10);
+        vbox.setAlignment(Pos.CENTER);
+
+
+        // Textfields
+        TextField artistNameField = new TextField();
+        artistNameField.setPromptText("Ange artist...");
+        artistNameField.setStyle("-fx-max-width: 300px;");
+
+        TextField concertAddressField = new TextField();
+        concertAddressField.setPromptText("Ange adress...");
+        concertAddressField.setStyle("-fx-max-width: 300px;");
+
+        TextField concertDateField = new TextField();
+        concertDateField.setPromptText("Ange datum...");
+        concertDateField.setStyle("-fx-max-width: 300px;");
+
+        TextField concertPriceField = new TextField();
+        concertPriceField.setPromptText("Ange pris...");
+        concertPriceField.setStyle("-fx-max-width: 300px;");
+
+        TextField concertMinAgeField = new TextField();
+        concertMinAgeField.setPromptText("Ange åldersgärns...");  //  sparar plats
+        concertMinAgeField.setStyle("-fx-max-width: 300px;");
+
+        TextField concertArenaField = new TextField();
+        concertArenaField.setPromptText("KANSKE DROPDOWN FÖR ARENOR?");  //  sparar plats
+        concertArenaField.setStyle("-fx-max-width: 300px;");
+
+
+        // lägg till-knapp
+        Button addButton = new Button("Lägg till");
+//        loginButton.setOnAction(event -> "hej");
+
+        Button updateButton = new Button("Uppdatera");
+//        loginButton.setOnAction(event -> "hej");
+
+        Button removeButton = new Button("Ta bort");
+//        loginButton.setOnAction(event -> "hej");
+
+
+        Label headerLabel = new Label("Wigell Conserter - Concerts");
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
 
-        Label infoLabel = new Label("Här kan vi CRUD konserter.");
-
-        root.getChildren().addAll(headerLabel, infoLabel);
+        // Lägg till stuff i vbox1
+        vbox.getChildren().addAll(artistNameField, concertAddressField, concertDateField, concertPriceField,
+                concertMinAgeField, concertArenaField, addButton, updateButton, removeButton);
+        root.getChildren().addAll(headerLabel, vbox);
         return root;
     }
 
