@@ -73,11 +73,12 @@ public class WcScreen {
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
 
         //CustumerListLabel
-        customerListLabel = new Label("apifughbapfeguhbapdfgu");
+        customerListLabel = new Label("Besökare");
+        customerListLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
 
         //concertInfoLabel
-        concertInfoLabel = new Label("aokfngåoäangåoghn");
-
+        concertInfoLabel = new Label("Info om arena");
+        concertInfoLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
 
 
 
@@ -85,7 +86,7 @@ public class WcScreen {
         hbox.getChildren().addAll(vbox1, vbox2);
 
         // Lägg till stuff i vbox1
-        vbox1.getChildren().addAll(concertDropdown, customerListLabel);
+        vbox1.getChildren().addAll(concertDropdown, concertInfoLabel);
 
         //Lägg till stuff i vbox2
         vbox2.getChildren().addAll(customerListLabel);
