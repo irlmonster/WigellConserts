@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.util.List;
 
@@ -34,6 +35,9 @@ public class WcScreen {
 
         // Lägg till flikarna i TabPane
         tabPane.getTabs().addAll(wcTab, arenaTab, concertTab);
+
+
+
     }
 
     private VBox wcTab() {
@@ -69,6 +73,9 @@ public class WcScreen {
         hbox.setAlignment(Pos.CENTER_LEFT);
         hbox.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
 
+        HBox hbox2 = new HBox();
+        hbox2.setStyle("-fx-padding: 10 0 0 700px;"); //top, right, bottom, left
+        hbox.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
 
 
         // dropdown för konserter
@@ -93,6 +100,13 @@ public class WcScreen {
         concertInfoLabel.setStyle("-fx-font-size: 12px;");
 
 
+        Button logoutButton = new Button("Logga ut");
+        logoutButton.setStyle("-fx-font-size: 12px;");
+        logoutButton.setOnAction(event -> {
+            FxManager fxManager = new FxManager((Stage) logoutButton.getScene().getWindow());
+            fxManager.showLoginScreen();
+        });
+
 
 
         //  Lägg till stuff i hbox
@@ -105,7 +119,8 @@ public class WcScreen {
         vbox2.getChildren().addAll(customerListLabel, customersLabel);
 
         //Lägg till stuff i vboxMid
-        vboxMid.getChildren().addAll(headerLabel);
+        vboxMid.getChildren().addAll(hbox2, headerLabel);
+        hbox2.getChildren().addAll(logoutButton);
 
         // Lägg till alla element i den överordnade VBoxen
         root.getChildren().addAll(vboxMid,hbox);
@@ -114,11 +129,15 @@ public class WcScreen {
 
     private VBox wcArenaTab() {
         VBox root = new VBox(20);
-        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-font-size: 12px; -fx-padding: 0 0 0 0px;");
         root.setStyle("-fx-background-color: #4682B4;"); // Grön bakgrund för Arena
 
         VBox vbox = new VBox(10);
         vbox.setAlignment(Pos.CENTER);
+
+        HBox hbox2 = new HBox();
+        hbox2.setStyle("-fx-padding: 10 -500 0 700px;"); //top, right, bottom, left
+        hbox2.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
 
 
         // Textfields
@@ -144,20 +163,33 @@ public class WcScreen {
         Button removeButton = new Button("Ta bort");
 //        loginButton.setOnAction(event -> "hej");
 
+        Button logoutButton = new Button("Logga ut");
+        logoutButton.setStyle("-fx-font-size: 12px;");
+        logoutButton.setOnAction(event -> {
+            FxManager fxManager = new FxManager((Stage) logoutButton.getScene().getWindow());
+            fxManager.showLoginScreen();
+        });
+
 
         // Lägg till stuff i vbox1
-        vbox.getChildren().addAll(arenanNameField, arenanAddressField, addButton, updateButton, removeButton);
-        root.getChildren().addAll(headerLabel, vbox);
+        hbox2.getChildren().addAll(logoutButton);
+        vbox.getChildren().addAll(headerLabel, arenanNameField, arenanAddressField, addButton, updateButton, removeButton);
+        root.getChildren().addAll(hbox2, vbox);
         return root;
     }
 
     private VBox wcConcertTab() {
         VBox root = new VBox(20);
-        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-font-size: 12px; -fx-padding: 0 0 0 0px;");
         root.setStyle("-fx-background-color: #4682B4;");
 
         VBox vbox = new VBox(10);
         vbox.setAlignment(Pos.CENTER);
+
+        HBox hbox2 = new HBox();
+        hbox2.setStyle("-fx-padding: 10 -500 0 700px;"); //top, right, bottom, left
+        hbox2.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
+
 
         // Lägg till labels
 //        Label radioBtnLabel = new Label("Markera för inomhuskonsert");
@@ -209,6 +241,14 @@ public class WcScreen {
             arenaDropDown.getItems().add(a.getName());
         }
 
+
+        //LOGGA UT - knapp
+        Button logoutButton = new Button("Logga ut");
+        logoutButton.setStyle("-fx-font-size: 12px;");
+        logoutButton.setOnAction(event -> {
+            FxManager fxManager = new FxManager((Stage) logoutButton.getScene().getWindow());
+            fxManager.showLoginScreen();
+        });
 
         //  LÄGG TILL NY
         // lägg till-knapp och logik för CREATEknappen
@@ -437,9 +477,10 @@ public class WcScreen {
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
 
         // Lägg till stuff i vbox1
-        vbox.getChildren().addAll(concertDropDown, arenaDropDown, artistNameField,  concertDateField, concertPriceField,
+        vbox.getChildren().addAll(headerLabel, concertDropDown, arenaDropDown, artistNameField,  concertDateField, concertPriceField,
                 concertMinAgeField, inDoorBtn, addButton, updateButton, removeButton);
-        root.getChildren().addAll(headerLabel, vbox);
+        hbox2.getChildren().addAll(logoutButton);
+        root.getChildren().addAll(hbox2, vbox);
         return root;
     }
 
