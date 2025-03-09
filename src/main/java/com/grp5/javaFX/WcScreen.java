@@ -202,6 +202,10 @@ public class WcScreen {
         arenanAddressField.setPromptText("Ange adress...");
         arenanAddressField.setStyle("-fx-max-width: 300px;");
 
+        // Lägg till radiobutton
+        RadioButton inDoorBtn = new RadioButton("Markera för inomhuskonsert");
+        inDoorBtn.setSelected(true);
+
 
         Label headerLabel = new Label("Wigell Conserter - Arena");
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
@@ -227,7 +231,7 @@ public class WcScreen {
         // Lägg till stuff i vbox1
         hbox2.getChildren().addAll(logoutButton);
         hbox3.getChildren().addAll(addButton, updateButton, removeButton);
-        vbox.getChildren().addAll(headerLabel, arenanNameField, arenanAddressField, hbox3);
+        vbox.getChildren().addAll(headerLabel, arenanNameField, arenanAddressField, inDoorBtn, hbox3);
         root.getChildren().addAll(hbox2, vbox);
         return root;
     }
