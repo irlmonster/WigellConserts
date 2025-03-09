@@ -35,7 +35,7 @@ public class FxManager {
                 tab.setStyle("-fx-background-color: #4682B4; -fx-min-width: 150px; -fx-max-width: 200px;");
             }
             if (newTab != null) {
-                newTab.setStyle("-fx-background-color: #FFFACD; -fx-text-fill: white; -fx-min-width: 150px; -fx-max-width: 200px;");
+                newTab.setStyle("-fx-background-color: #87CEFA; -fx-text-fill: white; -fx-min-width: 150px; -fx-max-width: 200px;");
             }
         });
         showLoginScreen();
@@ -74,7 +74,7 @@ public class FxManager {
                 tab.setStyle("-fx-background-color: #4682B4; -fx-min-width: 150px; -fx-max-width: 200px;");
             }
             if (newTab != null) {
-                newTab.setStyle("-fx-background-color: #FFFACD; -fx-text-fill: white; -fx-min-width: 150px; -fx-max-width: 200px;");
+                newTab.setStyle("-fx-background-color: #87CEFA; -fx-text-fill: white; -fx-min-width: 150px; -fx-max-width: 200px;");
             }
         });
     }
