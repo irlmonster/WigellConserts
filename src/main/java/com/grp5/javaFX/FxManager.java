@@ -40,7 +40,7 @@ public class FxManager {
         });
         showLoginScreen();
     }
-
+    //////////////////////////////////////      LOGIN SCREEN     //////////////////////////////////////
     public void showLoginScreen() {
         tabPane.getTabs().clear(); // Rensa alla gamla flikar
 
@@ -57,7 +57,7 @@ public class FxManager {
         // Lägg till båda flikarna i `TabPane`
         tabPane.getTabs().addAll(loginTab, regTab);
     }
-
+    //////////////////////////////////////      WC SCREEN     //////////////////////////////////////
     public void showWcScreen() {
         tabPane.getTabs().clear(); // Rensa gamla flikar
         tabPane.setStyle("-fx-background-color: #4682B4;");

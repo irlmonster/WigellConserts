@@ -39,7 +39,7 @@ public class WcScreen {
 
 
     }
-
+    //////////////////////////////////////      WC TAB     //////////////////////////////////////
     private VBox wcTab() {
         VBox root;
         ComboBox<String> concertDropdown;
@@ -174,6 +174,7 @@ public class WcScreen {
         return root;
     }
 
+    //////////////////////////////////////      ARENA TAB     //////////////////////////////////////
     private VBox wcArenaTab() {
         VBox root = new VBox(20);
         root.setStyle("-fx-font-size: 12px; -fx-padding: 0 0 0 0px;");
@@ -231,6 +232,7 @@ public class WcScreen {
         return root;
     }
 
+    //////////////////////////////////////      CONCERT TAB     //////////////////////////////////////
     private VBox wcConcertTab() {
         VBox root = new VBox(20);
         root.setStyle("-fx-font-size: 12px; -fx-padding: 0 0 0 0px;");
@@ -546,6 +548,7 @@ public class WcScreen {
         return tabPane;
     }
 
+    //////////////////////////////////////      ALERT POP-UP     //////////////////////////////////////
     // Metod för att Alert error - vi kan göra något annat om vi vill
     private void showAlert(String title, String message, Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
