@@ -69,7 +69,7 @@ public class WcScreen {
 
 
         // Skapa en HBox för att placera de två VBox-arna bredvid varandra
-        HBox hbox = new HBox();
+        HBox hbox = new HBox(10);
         hbox.setAlignment(Pos.CENTER_LEFT);
         hbox.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
 
@@ -78,26 +78,73 @@ public class WcScreen {
         hbox.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
 
 
-        // dropdown för konserter
-        concertDropdown = new ComboBox<>();
-        concertDropdown.setPrefWidth(150);
-        concertDropdown.getItems().addAll("Arch Enemy", "TOKIO HOTEL", "Yorushika", "Stuck in the Sound", "Breaking Benjamin");
-        concertDropdown.setPromptText("Välj Konsert");
-
-
         // Skapa en rubrik och en användartext
         Label headerLabel = new Label("Wigell Conserts");
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
 
+
+
+//////////////////////////////////////      KONSERT INFO     //////////////////////////////////////
+
+        // dropdown för konserter
+        concertDropdown = new ComboBox<>();
+        concertDropdown.setPrefWidth(150);
+        concertDropdown.setStyle("-fx-spacing: 0 0 20px 0;");
+        concertDropdown.setPromptText("Välj Konsert");
+        // label ftt visa info i
+        concertInfoLabel = new Label("");
+        concertInfoLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: black;");
+
+
+        // Fyller på dropdownen med konserter
+        ConcertDAO concertDAO = new ConcertDAO();
+        List<Concerts> concerts = concertDAO.getAllConcerts();
+        for (Concerts c : concerts) {
+            concertDropdown.getItems().add(c.getArtist_name());
+        }
+
+        // Logik för att visa info i label
+        concertDropdown.setOnAction(event -> {
+            String selectedArtist = concertDropdown.getValue();
+            if( selectedArtist != null) {
+                Concerts selectedConcert = concertDAO.getConcertByArtist(selectedArtist);
+                if(selectedConcert != null) {
+                    //hämta arena och adress
+                    Arena arena = selectedConcert.getArena();
+                    Addresses address = (arena != null) ? arena.getAddress() : null;
+
+                    // Sätt infon i en sträng
+
+                    String concertInfo = String.format("🎤 Artist: %s\n🏟️ Arena: %s\n📅 Datum: %s\n💰 Pris: %.2f kr\n🔞 Åldersgräns: %d\n📍 Adress: %s, %s %s",
+                            selectedConcert.getArtist_name(),
+                            (arena != null) ? arena.getName() : "Okänd arena",
+                            selectedConcert.getDate(),
+                            selectedConcert.getTicket_price(),
+                            selectedConcert.getAge_limit(),
+                            (address != null) ? address.getStreet() : "Okänd gata",
+                            (address != null) ? address.getCity() : "Okänd stad",
+                            (address != null) ? address.getPostal_code() : "Okänd postkod");
+
+                // Uppdatera labeln med konsertInfo
+                concertInfoLabel.setText(concertInfo);
+                } else {
+                    concertInfoLabel.setText("❌ Ingen info hittades för denna konsert.");
+                }
+            }
+
+        });
+
+
+
+//////////////////////////////////////      CUSTOMER INFO     //////////////////////////////////////
         //CustumerListLabel
         customerListLabel = new Label("Besökare");
         customerListLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
         customersLabel = new Label();
         customersLabel.setText("använd denna för att lista besökare beroende på vald arena");
 
-        //concertInfoLabel
-        concertInfoLabel = new Label("använd denna för att lista info beroende på vald arena");
-        concertInfoLabel.setStyle("-fx-font-size: 12px;");
+        //
+
 
 
         Button logoutButton = new Button("Logga ut");
@@ -136,8 +183,13 @@ public class WcScreen {
         vbox.setAlignment(Pos.CENTER);
 
         HBox hbox2 = new HBox();
-        hbox2.setStyle("-fx-padding: 10 -500 0 700px;"); //top, right, bottom, left
+        hbox2.setStyle("-fx-padding: 10 0 0 700px;"); //top, right, bottom, left
         hbox2.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
+
+
+        HBox hbox3 = new HBox();
+        hbox3.setAlignment(Pos.CENTER);
+        hbox3.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
 
 
         // Textfields
@@ -173,7 +225,8 @@ public class WcScreen {
 
         // Lägg till stuff i vbox1
         hbox2.getChildren().addAll(logoutButton);
-        vbox.getChildren().addAll(headerLabel, arenanNameField, arenanAddressField, addButton, updateButton, removeButton);
+        hbox3.getChildren().addAll(addButton, updateButton, removeButton);
+        vbox.getChildren().addAll(headerLabel, arenanNameField, arenanAddressField, hbox3);
         root.getChildren().addAll(hbox2, vbox);
         return root;
     }
@@ -187,8 +240,12 @@ public class WcScreen {
         vbox.setAlignment(Pos.CENTER);
 
         HBox hbox2 = new HBox();
-        hbox2.setStyle("-fx-padding: 10 -500 0 700px;"); //top, right, bottom, left
+        hbox2.setStyle("-fx-padding: 10 0 0 700px;"); //top, right, bottom, left
         hbox2.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
+
+        HBox hbox3 = new HBox();
+        hbox3.setAlignment(Pos.CENTER);
+        hbox3.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
 
 
         // Lägg till labels
@@ -477,10 +534,11 @@ public class WcScreen {
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
 
         // Lägg till stuff i vbox1
+        hbox3.getChildren().addAll(addButton, updateButton, removeButton);
         vbox.getChildren().addAll(headerLabel, concertDropDown, arenaDropDown, artistNameField,  concertDateField, concertPriceField,
-                concertMinAgeField, inDoorBtn, addButton, updateButton, removeButton);
+                concertMinAgeField, inDoorBtn, hbox3);
         hbox2.getChildren().addAll(logoutButton);
-        root.getChildren().addAll(hbox2, vbox);
+        root.getChildren().addAll(hbox2,vbox);
         return root;
     }
 
