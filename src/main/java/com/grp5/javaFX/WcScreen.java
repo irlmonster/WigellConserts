@@ -257,7 +257,7 @@ public class WcScreen {
                 inDoorBtn.setSelected(true);
                 arenaDropDown.getSelectionModel().clearSelection();
 
-                showAlert("GREAT SUCCESS!", "GREAT SUCCESS! \n Borat har lagt till konserten i databasen!", Alert.AlertType.INFORMATION);
+                showAlert("GREAT SUCCESS!", "✅ GREAT SUCCESS! ✅ \nBorat har lagt till konserten i databasen!", Alert.AlertType.INFORMATION);
 
             } catch (NumberFormatException e) {
                 showAlert("Fel", "Pris och åldersgräns måste vara siffror!", Alert.AlertType.ERROR);
@@ -325,7 +325,7 @@ public class WcScreen {
                 concertDropDown.getItems().set(concertDropDown.getSelectionModel().getSelectedIndex(), artistName);
                 concertDropDown.getSelectionModel().select(artistName); // Sätter den till den nya
 
-                showAlert("Uppdaterad!", "GREAT SUCCESS! \n Borat har uppdaterat konserten!", Alert.AlertType.INFORMATION);
+                showAlert("Uppdaterad!", " ✅ GREAT SUCCESS! ✅ \n Borat har uppdaterat konserten för artisten: " + selectedConcert.getArtist_name() +".", Alert.AlertType.INFORMATION);
 
 
             } catch (NumberFormatException e) {
@@ -339,7 +339,61 @@ public class WcScreen {
 
         // lägg till-knapp och logik för DELETEknappen
         Button removeButton = new Button("Ta bort");
-//        removeButton.setOnAction(event -> "hej");
+        removeButton.setOnAction(event -> {
+            String selectedArtist = concertDropDown.getValue();
+
+            // Kolla att en artist är valt
+            if (selectedArtist == null || selectedArtist.equals("- Lägg till ny konsert -")) {
+                 showAlert("Fel", "Välj en konsert att ta bort!", Alert.AlertType.ERROR);
+                 return;
+            }
+
+            // Hämta vald konsert från databasen
+            Concerts selectedConcert = concertDAO.getConcertByArtist(selectedArtist);
+            if (selectedConcert == null) {
+                showAlert("Fel", "Konserten hittades inte i databasen!", Alert.AlertType.ERROR);
+                return;
+            }
+
+            // Bekräfta radering
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Bekräfta radering");
+            confirmAlert.setHeaderText("Är du säker på att du vill ta bort konserten?");
+            confirmAlert.setHeaderText("Denna åtgärd går inte att ångra.");
+
+            confirmAlert.showAndWait().ifPresent(response -> {
+                if(response == ButtonType.OK) {
+                    //Ta bort konserten ur databasen
+                    concertDAO.deleteConcerts(selectedConcert);
+                    // ta bort fårn dropdown
+                    concertDropDown.getItems().remove(selectedArtist);
+                    // Visa nästa konsert i listan
+                    if (!concertDropDown.getItems().isEmpty()) {
+                        concertDropDown.getSelectionModel().selectFirst();
+                    } else {
+                        // Om listan är tom, lägg tillbaka "- Lägg till ny konsert -"
+                        concertDropDown.getItems().add("- Lägg till ny konsert -");
+                        concertDropDown.getSelectionModel().select(0);
+                    }
+
+                    // Rensa textfälten
+                    artistNameField.clear();
+                    concertDateField.clear();
+                    concertPriceField.clear();
+                    concertMinAgeField.clear();
+                    inDoorBtn.setSelected(true);
+                    arenaDropDown.getSelectionModel().clearSelection();
+                    concertDropDown.getSelectionModel().clearSelection();
+
+                    showAlert("Borttagen!", "✅ Borat kröp in i databasen och slet ut artisten " + selectedConcert.getArtist_name()
+                            + " ✅\nPOFF, GONE!!", Alert.AlertType.INFORMATION);
+                }
+            });
+
+        });
+
+
+
 
 
 
@@ -369,7 +423,6 @@ public class WcScreen {
                     Arena arena = selectedConcert.getArena();
                     if (arena != null) {
                         arenaDropDown.setValue(arena.getName()); // sätter rätt arena
-                        System.out.println("✅ Arena dropdown satt till: " + arena.getName());
                         inDoorBtn.setSelected(arena.isIndoor()); // sätt radiobutton baserat på indoor / outdoor
                     }
 
@@ -377,17 +430,6 @@ public class WcScreen {
 
             }
         });
-
-
-//        Vad görs ovanför?
-//                Om vi väljer "Lägg till ny konsert" så clearar vi alla adressfält annars så
-//                Hämtar vi konserten från databasen.
-//                Fyller i artistens namn i textfältet.
-//                Hämtar arenan kopplad till konserten.
-//                Om arenan finns, hämtar info och formaterar den till en String.
-//                Sätter radioknappen beroende på om arenan är inomhus eller inte.
-
-
 
 
 
