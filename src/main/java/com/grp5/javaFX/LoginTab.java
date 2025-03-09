@@ -48,7 +48,7 @@ public class LoginTab {
 
         if (username.equals("Admin") && password.equals("Admin")) {
             fxManager.showWcScreen(); // Byter till WcScreen
-        } else if (username.equals("Customer") && password.equals("Customer")) {
+        } else if (username.equals("Customer") && password.equals("123")) {
             fxManager.showWcScreen(); // Byter till CustomerScreen
         } else {
             System.out.println("Felaktiga inloggningsuppgifter!");
