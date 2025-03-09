@@ -1,10 +1,19 @@
 package com.grp5.javaFX;
 
+import DAOklasser.ArenaDAO;
+import DAOklasser.ConcertDAO;
+import com.grp5.entitys.Addresses;
+import com.grp5.entitys.Arena;
+import com.grp5.entitys.Concerts;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Label;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
+import java.util.List;
 
 public class WcScreen {
 
@@ -32,6 +41,7 @@ public class WcScreen {
         ComboBox<String> concertDropdown;
         Label customerListLabel;
         Label concertInfoLabel;
+        Label customersLabel;
 
         // Skapa en överordnad VBox med 20 pixlars mellanrum och centrerat innehåll
         VBox vboxMid= new VBox();
@@ -46,7 +56,7 @@ public class WcScreen {
         VBox vbox2 = new VBox();
 
         vbox1.setPadding(new Insets(0, 0, 0, 60)); // (top, right, bottom, left)
-        vbox2.setPadding(new Insets(0, 0, 0, 210)); // (top, right, bottom, left)
+        vbox2.setPadding(new Insets(0, 0, 0, 120)); // (top, right, bottom, left)
 
 
         // Lägg till innehåll i varje VBox
@@ -75,10 +85,13 @@ public class WcScreen {
         //CustumerListLabel
         customerListLabel = new Label("Besökare");
         customerListLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+        customersLabel = new Label();
+        customersLabel.setText("använd denna för att lista besökare beroende på vald arena");
 
         //concertInfoLabel
-        concertInfoLabel = new Label("Info om arena");
-        concertInfoLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+        concertInfoLabel = new Label("använd denna för att lista info beroende på vald arena");
+        concertInfoLabel.setStyle("-fx-font-size: 12px;");
+
 
 
 
@@ -89,7 +102,7 @@ public class WcScreen {
         vbox1.getChildren().addAll(concertDropdown, concertInfoLabel);
 
         //Lägg till stuff i vbox2
-        vbox2.getChildren().addAll(customerListLabel);
+        vbox2.getChildren().addAll(customerListLabel, customersLabel);
 
         //Lägg till stuff i vboxMid
         vboxMid.getChildren().addAll(headerLabel);
@@ -141,55 +154,249 @@ public class WcScreen {
     private VBox wcConcertTab() {
         VBox root = new VBox(20);
         root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #4682B4;"); // Grön bakgrund för Arena
+        root.setStyle("-fx-background-color: #4682B4;");
 
         VBox vbox = new VBox(10);
         vbox.setAlignment(Pos.CENTER);
 
+        // Lägg till labels
+//        Label radioBtnLabel = new Label("Markera för inomhuskonsert");
 
         // Textfields
+        ComboBox<String> concertDropDown = new ComboBox<>();
+        concertDropDown.setPromptText("Välj befintlig konsert...");
+        concertDropDown.setStyle("-fx-max-width: 300px;");
+
+        ComboBox<String> arenaDropDown = new ComboBox<>();
+        arenaDropDown.setPromptText("Välj arena...");
+        arenaDropDown.setStyle("-fx-max-width: 300px;");
+
         TextField artistNameField = new TextField();
         artistNameField.setPromptText("Ange artist...");
         artistNameField.setStyle("-fx-max-width: 300px;");
-
-        TextField concertAddressField = new TextField();
-        concertAddressField.setPromptText("Ange adress...");
-        concertAddressField.setStyle("-fx-max-width: 300px;");
 
         TextField concertDateField = new TextField();
         concertDateField.setPromptText("Ange datum...");
         concertDateField.setStyle("-fx-max-width: 300px;");
 
         TextField concertPriceField = new TextField();
-        concertPriceField.setPromptText("Ange pris...");
+        concertPriceField.setPromptText("Ange pris... (använd punkt)");
         concertPriceField.setStyle("-fx-max-width: 300px;");
 
         TextField concertMinAgeField = new TextField();
-        concertMinAgeField.setPromptText("Ange åldersgärns...");  //  sparar plats
+        concertMinAgeField.setPromptText("Ange åldersgärns...");
         concertMinAgeField.setStyle("-fx-max-width: 300px;");
 
-        TextField concertArenaField = new TextField();
-        concertArenaField.setPromptText("KANSKE DROPDOWN FÖR ARENOR?");  //  sparar plats
-        concertArenaField.setStyle("-fx-max-width: 300px;");
+
+        // Lägg till radiobutton
+        RadioButton inDoorBtn = new RadioButton("Markera för inomhuskonsert");
+        inDoorBtn.setSelected(true);
 
 
-        // lägg till-knapp
-        Button addButton = new Button("Lägg till");
-//        loginButton.setOnAction(event -> "hej");
+        // LOGIK
+        // Fyller konserter i dropdown, lägger till en tom som har tomma fält
+        ConcertDAO concertDAO = new ConcertDAO();
+        List<Concerts> concerts = concertDAO.getAllConcerts();
+        concertDropDown.getItems().add("- Lägg till ny konsert -");
+        for (Concerts c : concerts) {
+            concertDropDown.getItems().add(c.getArtist_name());
+        }
 
+        // Fyller arenor i dropdownen
+        ArenaDAO arenaDAO = new ArenaDAO();
+        List<Arena> arenas = arenaDAO.getAllArenas();
+        for (Arena a : arenas) {
+            arenaDropDown.getItems().add(a.getName());
+        }
+
+
+        //  LÄGG TILL NY
+        // lägg till-knapp och logik för CREATEknappen
+        Button addButton = new Button("Skapa ny");
+        addButton.setOnAction(event -> {
+            // Hämta alla värden från fälten
+            String artistName = artistNameField.getText().trim();
+            String selectedArenaName = arenaDropDown.getValue(); // Hämtar vald arena
+            String concertDate = concertDateField.getText().trim();
+            String concertPriceText = concertPriceField.getText().trim();
+            String concertMinAgeText = concertMinAgeField.getText().trim();
+
+            // Kontrollera att alla fält är ifyllda
+            if (artistName.isEmpty() || selectedArenaName == null || selectedArenaName.isEmpty() ||
+                    concertDate.isEmpty() || concertPriceText.isEmpty() || concertMinAgeText.isEmpty()) {
+                showAlert("Fel", "Alla fält måste fyllas i!", Alert.AlertType.ERROR);
+                return;
+            }
+
+            try {
+                // Konvertera numeriska fält
+                double concertPrice = Double.parseDouble(concertPriceText);
+                int concertMinAge = Integer.parseInt(concertMinAgeText);
+
+                // Hämta vald arena från databasen
+                Arena selectedArena = arenaDAO.getArenaByName(selectedArenaName);
+                if (selectedArena == null) {
+                    showAlert("Fel", "Vald arena hittades inte i databasen!", Alert.AlertType.ERROR);
+                    return;
+                }
+
+                // Skapa konsert med vald arena
+                Concerts newConcert = new Concerts(artistName, concertDate, concertPrice, concertMinAge, selectedArena);
+
+                // Spara konserten i databasen
+                concertDAO.saveConcert(newConcert);
+
+                // Uppdatera dropdown-listan
+                concertDropDown.getItems().add(newConcert.getArtist_name());
+
+                // Återställ fälten efter att konserten lagts till
+                artistNameField.clear();
+                concertDateField.clear();
+                concertPriceField.clear();
+                concertMinAgeField.clear();
+                inDoorBtn.setSelected(true);
+                arenaDropDown.getSelectionModel().clearSelection();
+
+                showAlert("GREAT SUCCESS!", "GREAT SUCCESS! \n Borat har lagt till konserten i databasen!", Alert.AlertType.INFORMATION);
+
+            } catch (NumberFormatException e) {
+                showAlert("Fel", "Pris och åldersgräns måste vara siffror!", Alert.AlertType.ERROR);
+            }
+        });
+
+        // UPPDATERA
+        // lägg till-knapp och logik för UPDATEknappen
         Button updateButton = new Button("Uppdatera");
-//        loginButton.setOnAction(event -> "hej");
+        updateButton.setOnAction(event -> {
+            System.out.println("🟢 Uppdateringsknappen klickad!");
+            String selectedArtist = concertDropDown.getValue();
 
+            if (selectedArtist != null && selectedArtist.equals("- Lägg till ny konsert -")) {
+                showAlert("Fel", "Välj en konsert att uppdatera!", Alert.AlertType.ERROR);
+                return;
+            }
+
+            // Hämta fältens värden
+            String artistName = artistNameField.getText().trim();
+            String selectedArenaName = arenaDropDown.getValue();
+            String concertDate = concertDateField.getText().trim();
+            String concertPriceText = concertPriceField.getText().trim();
+            String concertMinAgeText = concertMinAgeField.getText().trim();
+            boolean IsIndoor = inDoorBtn.isSelected();
+
+            // Kontroll att inget fält är tomt
+            if (artistName.isEmpty() || selectedArenaName .isEmpty() || concertDate.isEmpty() ||
+                    concertPriceText.isEmpty() || concertMinAgeText.isEmpty()) {
+                showAlert("Fel", "Alla fält måste fyllas i!", Alert.AlertType.ERROR);
+                return;
+            }
+
+            try {
+                //Konvertera numeriska fält
+                double concertPrice = Double.parseDouble(concertPriceText);
+                int concertMinAge = Integer.parseInt(concertMinAgeText);
+
+                // hämta vald konsert från DB
+                Concerts selectedConcert = concertDAO.getConcertByArtist(selectedArtist);
+                if (selectedConcert == null) {
+                    showAlert("Fel", "Vald arena hittades inte!", Alert.AlertType.ERROR);
+                    return;
+                }
+
+
+                // Hämta vald arena från DB
+                Arena selectedArena = arenaDAO.getArenaByName(selectedArenaName);
+                if (selectedArena == null) {
+                    System.out.println("❌ Arena hittades inte i databasen!");
+                } else {
+                    System.out.println("✅ Arena hittad: " + selectedArena.getName());
+                }
+
+                // Uppdatera konserten med nya värden
+                selectedConcert.setArtist_name(artistName);
+                selectedConcert.setDate(concertDate);
+                selectedConcert.setTicket_price(concertPrice);
+                selectedConcert.setAge_limit(concertMinAge);
+                selectedConcert.setArena(selectedArena);
+
+                //spara uppdateringen i databasen
+                concertDAO.updateConcerts(selectedConcert);
+                //uppdatera dropdownlistan så att det nya namnet visas
+                concertDropDown.getItems().set(concertDropDown.getSelectionModel().getSelectedIndex(), artistName);
+                concertDropDown.getSelectionModel().select(artistName); // Sätter den till den nya
+
+                showAlert("Uppdaterad!", "GREAT SUCCESS! \n Borat har uppdaterat konserten!", Alert.AlertType.INFORMATION);
+
+
+            } catch (NumberFormatException e) {
+                showAlert("Fel", "Pris och åldersgräns måste vara siffror!", Alert.AlertType.ERROR);
+            }
+
+        });
+
+
+
+
+        // lägg till-knapp och logik för DELETEknappen
         Button removeButton = new Button("Ta bort");
-//        loginButton.setOnAction(event -> "hej");
+//        removeButton.setOnAction(event -> "hej");
+
+
+
+
+        // Uppdatera fälten efter vald konsert
+        concertDropDown.setOnAction(event -> {
+            String selectedArtist = concertDropDown.getValue();
+            if("- Lägg till ny konsert -".equals(selectedArtist)) {
+                // Tömmer alla fält
+                artistNameField.clear();
+                concertDateField.clear();
+                concertMinAgeField.clear();
+                concertPriceField.clear();
+                inDoorBtn.setSelected(true); // standardval att det är inomhus då
+            } else if (selectedArtist != null) {
+                Concerts selectedConcert = concertDAO.getConcertByArtist(selectedArtist);
+                if (selectedConcert != null) {
+                    // Sätt artistens namn
+                    artistNameField.setText(selectedConcert.getArtist_name());
+                    // Sätt datum
+                    concertDateField.setText(selectedConcert.getDate());
+                    //Sätt pris
+                    concertPriceField.setText(String.valueOf(selectedConcert.getTicket_price()));
+                    // sätt åldersgräns
+                    concertMinAgeField.setText(String.valueOf(selectedConcert.getAge_limit()));
+                    //Hämta arenan
+                    Arena arena = selectedConcert.getArena();
+                    if (arena != null) {
+                        arenaDropDown.setValue(arena.getName()); // sätter rätt arena
+                        System.out.println("✅ Arena dropdown satt till: " + arena.getName());
+                        inDoorBtn.setSelected(arena.isIndoor()); // sätt radiobutton baserat på indoor / outdoor
+                    }
+
+                }
+
+            }
+        });
+
+
+//        Vad görs ovanför?
+//                Om vi väljer "Lägg till ny konsert" så clearar vi alla adressfält annars så
+//                Hämtar vi konserten från databasen.
+//                Fyller i artistens namn i textfältet.
+//                Hämtar arenan kopplad till konserten.
+//                Om arenan finns, hämtar info och formaterar den till en String.
+//                Sätter radioknappen beroende på om arenan är inomhus eller inte.
+
+
+
 
 
         Label headerLabel = new Label("Wigell Conserter - Concerts");
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
 
         // Lägg till stuff i vbox1
-        vbox.getChildren().addAll(artistNameField, concertAddressField, concertDateField, concertPriceField,
-                concertMinAgeField, concertArenaField, addButton, updateButton, removeButton);
+        vbox.getChildren().addAll(concertDropDown, arenaDropDown, artistNameField,  concertDateField, concertPriceField,
+                concertMinAgeField, inDoorBtn, addButton, updateButton, removeButton);
         root.getChildren().addAll(headerLabel, vbox);
         return root;
     }
@@ -197,4 +404,14 @@ public class WcScreen {
     public TabPane getTabPane() {
         return tabPane;
     }
+
+    // Metod för att Alert error - vi kan göra något annat om vi vill
+    private void showAlert(String title, String message, Alert.AlertType alertType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 }
