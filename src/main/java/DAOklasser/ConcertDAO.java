@@ -71,16 +71,15 @@ public class ConcertDAO {
 
 
     //DELETE
-    public void deleteConcerts(int concertID) {
+    public void deleteConcerts(Concerts concert) {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            Concerts concert = session.get(Concerts.class, concertID);
             if (concert != null) {
                 session.delete(concert);
-                System.out.println("Konserten med ID " + concertID + " har tagits bort!");
+                System.out.println("Konserten med namn " + concert + " har tagits bort!");
             } else {
-                System.out.println("Hittade ingen konsert med ID " + concertID + ".");
+                System.out.println("Hittade ingen konsert med namnet " + concert + ".");
             }
             transaction.commit();
         } catch (Exception e) {
