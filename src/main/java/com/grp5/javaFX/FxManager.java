@@ -20,12 +20,27 @@ public class FxManager {
         stage.setTitle("Wigell Conserter");
         stage.show();
 
-        // Skapa en TabPane och visa inloggnings- och registreringsflikarna
+
+
+
         tabPane = new TabPane();
+        tabPane.setStyle("-fx-background-color: #4682B4;");
         root.setCenter(tabPane);
+
+        tabPane.setStyle("-fx-tab-min-width: 364px; -fx-tab-max-width: 365px;"); // Storlek på flikar
+
+        // **Lyssnare för att ändra färg när fliken ändras**
+        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            for (Tab tab : tabPane.getTabs()) {
+                tab.setStyle("-fx-background-color: #4682B4; -fx-min-width: 150px; -fx-max-width: 200px;");
+            }
+            if (newTab != null) {
+                newTab.setStyle("-fx-background-color: #87CEFA; -fx-text-fill: white; -fx-min-width: 150px; -fx-max-width: 200px;");
+            }
+        });
         showLoginScreen();
     }
-
+    //////////////////////////////////////      LOGIN SCREEN     //////////////////////////////////////
     public void showLoginScreen() {
         tabPane.getTabs().clear(); // Rensa alla gamla flikar
 
@@ -42,12 +57,29 @@ public class FxManager {
         // Lägg till båda flikarna i `TabPane`
         tabPane.getTabs().addAll(loginTab, regTab);
     }
-
+    //////////////////////////////////////      WC SCREEN     //////////////////////////////////////
     public void showWcScreen() {
         tabPane.getTabs().clear(); // Rensa gamla flikar
-
+        tabPane.setStyle("-fx-background-color: #4682B4;");
         // Skapa WC-skärmen med dess tre flikar (WC, Arena, Konsert)
         WcScreen wcScreen = new WcScreen();
         tabPane.getTabs().addAll(wcScreen.getTabPane().getTabs());
+
+        // **Sätt min/max bredd på flikarna**
+        tabPane.setStyle("-fx-tab-min-width: 245px; -fx-tab-max-width: 246px;");
+
+        // **Lyssnare för att ändra färg när fliken ändras**
+        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            for (Tab tab : tabPane.getTabs()) {
+                tab.setStyle("-fx-background-color: #4682B4; -fx-min-width: 150px; -fx-max-width: 200px;");
+            }
+            if (newTab != null) {
+                newTab.setStyle("-fx-background-color: #87CEFA; -fx-text-fill: white; -fx-min-width: 150px; -fx-max-width: 200px;");
+            }
+        });
     }
+
+
+
+
 }
