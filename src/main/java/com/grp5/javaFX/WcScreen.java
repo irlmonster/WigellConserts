@@ -368,7 +368,53 @@ public class WcScreen {
         });
 
         Button removeButton = new Button("Ta bort");
-//        loginButton.setOnAction(event -> "hej");
+        removeButton.setOnAction(event -> {
+            String selectedArena = arenaDropDown.getValue();
+
+            // Kollar att en arena är vald
+            if(selectedArena == null || selectedArena.equals("- Lägg till ny arena -")) {
+                showAlert("Fel", "Du måste välja en arena att ta bort", Alert.AlertType.ERROR);
+                return;
+            }
+
+
+            Arena thisArena = arenaDAO.getArenaByArenaName(selectedArena);
+
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Bekräfta radering");
+            confirmAlert.setHeaderText("Är du säker på att du vill ta bort konserten?");
+            confirmAlert.setHeaderText("Denna åtgärd går inte att ångra.");
+
+            confirmAlert.showAndWait().ifPresent(response -> {
+                if(response == ButtonType.OK) {
+                    // Tar bort arenan från databasen
+                    arenaDAO.deleteArena(thisArena);
+                    // Tar bort arenan från dropdown
+                    arenaDropDown.getItems().remove(selectedArena);
+                    //Visa nästa arena i listan
+                    if(!arenaDropDown.getItems().isEmpty()) {
+                        arenaDropDown.getSelectionModel().selectFirst();
+                    } else {
+                        // Om listan är tom sätt till - Lägg till ny arena -
+                        arenaDropDown.getItems().add("- Lägg till ny arena -");
+                        arenaDropDown.getSelectionModel().select(0);
+                    }
+
+                    // rensa textfälten
+                    arenanNameField.clear();
+                    arenanStreetField.clear();
+                    arenanHouseNumField.clear();
+                    arenanPostalField.clear();
+                    arenanCityField.clear();
+                    inDoorBtn.setSelected(true);
+                    arenaDropDown.getSelectionModel().clearSelection();
+
+                    showAlert("Borttagen!", "✅ Borat kröp in i databasen och slet ut artisten " + thisArena.getName()
+                            + " ✅\nPOFF, GONE!!", Alert.AlertType.INFORMATION);
+                }
+            });
+
+        });
 
         Button logoutButton = new Button("Logga ut");
         logoutButton.setStyle("-fx-font-size: 12px;");
