@@ -1,5 +1,6 @@
 package com.grp5.javaFX;
 
+import com.grp5.entitys.Customer;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -43,12 +44,13 @@ public class LoginTab {
     }
 
     private void login() {
+        Customer customerUser = new Customer();
         String username = nameField.getText();
         String password = passwordField.getText();
 
         if (username.equals("Admin") && password.equals("Admin")) {
             fxManager.showWcScreen(); // Byter till WcScreen
-        } else if (username.equals("Customer") && password.equals("123")) {
+        } else if (username.equals(customerUser.getFirst_name()) && password.equals("123")) {
             fxManager.showWcScreen(); // Byter till CustomerScreen
         } else {
             System.out.println("Felaktiga inloggningsuppgifter!");

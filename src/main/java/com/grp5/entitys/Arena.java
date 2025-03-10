@@ -23,6 +23,12 @@ public class Arena {
     public Arena(){
     }
 
+    public Arena(String name, Addresses address, boolean indoor){
+        this.name = name;
+        this.address = address;
+        this.indoor = indoor;
+    }
+
     public int getId() {
         return id;
     }

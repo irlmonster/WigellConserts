@@ -5,6 +5,7 @@ import DAOklasser.ConcertDAO;
 import com.grp5.entitys.Addresses;
 import com.grp5.entitys.Arena;
 import com.grp5.entitys.Concerts;
+import com.mysql.cj.Session;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Label;
 import javafx.geometry.Insets;
@@ -15,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.List;
+
 
 public class WcScreen {
 
@@ -60,11 +62,7 @@ public class WcScreen {
         VBox vbox2 = new VBox();
 
         vbox1.setPadding(new Insets(0, 0, 0, 60)); // (top, right, bottom, left)
-
-        vbox1.setPrefSize(300, 500);  // Sätter en fast storlek
-
         vbox2.setPadding(new Insets(0, 0, 0, 120)); // (top, right, bottom, left)
-        vbox2.setPrefSize(400, 500);  // Sätter en fast storlek
 
 
         // Lägg till innehåll i varje VBox
@@ -89,10 +87,6 @@ public class WcScreen {
 
 
 //////////////////////////////////////      KONSERT INFO     //////////////////////////////////////
-
-        Label label2 = new Label("Konserter");
-        label2.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
-        label2.setPadding(new Insets(0, 0, 20, 35));
 
         // dropdown för konserter
         concertDropdown = new ComboBox<>();
@@ -168,7 +162,7 @@ public class WcScreen {
         hbox.getChildren().addAll(vbox1, vbox2);
 
         // Lägg till stuff i vbox1
-        vbox1.getChildren().addAll(label2, concertDropdown, concertInfoLabel);
+        vbox1.getChildren().addAll(concertDropdown, concertInfoLabel);
 
         //Lägg till stuff i vbox2
         vbox2.getChildren().addAll(customerListLabel, customersLabel);
@@ -202,13 +196,29 @@ public class WcScreen {
 
 
         // Textfields
+        ComboBox<String> arenaDropDown = new ComboBox<>();
+        arenaDropDown.setPromptText("Välj arena / skapa ny...");
+        arenaDropDown.setStyle("-fx-max-width: 300px;");
+
         TextField arenanNameField = new TextField();
         arenanNameField.setPromptText("Ange arenanamn...");
         arenanNameField.setStyle("-fx-max-width: 300px;");
 
-        TextField arenanAddressField = new TextField();
-        arenanAddressField.setPromptText("Ange adress...");
-        arenanAddressField.setStyle("-fx-max-width: 300px;");
+        TextField arenanStreetField = new TextField();
+        arenanStreetField.setPromptText("Ange gata...");
+        arenanStreetField.setStyle("-fx-max-width: 300px;");
+
+        TextField arenanHouseNumField = new TextField();
+        arenanHouseNumField.setPromptText("Ange gatunummer...");
+        arenanHouseNumField.setStyle("-fx-max-width: 300px;");
+
+        TextField arenanPostalField = new TextField();
+        arenanPostalField.setPromptText("Ange postnummer...");
+        arenanPostalField.setStyle("-fx-max-width: 300px;");
+
+        TextField arenanCityField = new TextField();
+        arenanCityField.setPromptText("Ange stad...");
+        arenanCityField.setStyle("-fx-max-width: 300px;");
 
         // Lägg till radiobutton
         RadioButton inDoorBtn = new RadioButton("Markera för inomhuskonsert");
@@ -218,9 +228,66 @@ public class WcScreen {
         Label headerLabel = new Label("Wigell Conserter - Arena");
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
 
+        // Fyller listan med arena info och lägger till en ny
+        ArenaDAO arenaDAO = new ArenaDAO();
+        List<Arena> arenas = arenaDAO.getAllArenas();
+        arenaDropDown.getItems().add("- Lägg till ny arena -");
+        for (Arena a : arenas) {
+            arenaDropDown.getItems().add(a.getName());
+        }
+
+
+
         // knappar
         Button addButton = new Button("Lägg till");
-//        loginButton.setOnAction(event -> "hej");
+        addButton.setOnAction(event -> {
+            String arenaName = arenanNameField.getText().trim();
+            String arenaStreet = arenanStreetField.getText().trim();
+            String arenaHouseNum = arenanHouseNumField.getText().trim();
+            String arenaPostal = arenanPostalField.getText().trim();
+            String arenaCity = arenanCityField.getText().trim();
+            Boolean isIndoor = true;
+            inDoorBtn.setSelected(isIndoor);
+
+
+            // Skapa en ny Addresses-instans
+            Addresses newAddress = new Addresses();
+            newAddress.setStreet(arenaStreet);
+            newAddress.setHouse_number(arenaHouseNum);
+            newAddress.setPostal_code(arenaPostal);
+            newAddress.setCity(arenaCity);
+
+            if(arenaName.isEmpty() || arenaStreet.isEmpty() || arenaHouseNum.isEmpty() || arenaPostal.isEmpty() || arenaCity.isEmpty()){
+                showAlert("Fel", "Alla fält måste fyllas i", Alert.AlertType.ERROR);
+                return;
+            }
+
+            try {
+                // Skapar en ny arena med adress
+                Arena newArena = new Arena(arenaName, newAddress, isIndoor);
+
+                // Spara arena till DB
+                arenaDAO.saveArena(newArena);
+
+                // Uppdatera dropdown
+                arenaDropDown.getItems().add(newArena.getName());
+
+                // Återställer fälten när nya arenan lagts till
+                arenanNameField.clear();
+                arenanStreetField.clear();
+                arenanHouseNumField.clear();
+                arenanPostalField.clear();
+                arenanCityField.clear();
+                inDoorBtn.setSelected(true);
+                arenaDropDown.getSelectionModel().clearSelection();
+
+                showAlert("GREAT SUCCESS!", "✅ GREAT SUCCESS! ✅ \nBorat har lagt till arenan i databasen!", Alert.AlertType.INFORMATION);
+
+            } catch (NumberFormatException e) {
+                showAlert("Fel", "Postnummer måste vara siffror!", Alert.AlertType.ERROR);
+            }
+        });
+
 
         Button updateButton = new Button("Uppdatera");
 //        loginButton.setOnAction(event -> "hej");
@@ -235,14 +302,54 @@ public class WcScreen {
             fxManager.showLoginScreen();
         });
 
+        // Uppdatera fälten efter vald konsert
+        arenaDropDown.setOnAction(event -> {
+            String selectedArena = arenaDropDown.getValue();
 
+            if ("- Lägg till ny arena -".equals(selectedArena)) {
+                // Tömmer alla fält för att lägga till en ny arena
+                arenanNameField.clear();
+                arenanStreetField.clear();
+                arenanHouseNumField.clear();
+                arenanPostalField.clear();
+                arenanCityField.clear();
+                inDoorBtn.setSelected(true); // Standardval att det är inomhus då
+            } else if (selectedArena != null) {
+                // Hämtar den valda arenan från databasen via ArenaDAO
+                Arena chosenArena = arenaDAO.getArenaByArenaName(selectedArena);
+
+                if (chosenArena != null) {
+                    // Sätt arenans namn
+                    arenanNameField.setText(chosenArena.getName());
+
+                    // Sätt gatunamn från arenans adress (här antar vi att getAddress() returnerar en Address)
+                    if (chosenArena.getAddress() != null) {
+                        arenanStreetField.setText(chosenArena.getAddress().getStreet());
+                        arenanHouseNumField.setText(chosenArena.getAddress().getHouse_number());
+                        arenanPostalField.setText(chosenArena.getAddress().getPostal_code());
+                        arenanCityField.setText(chosenArena.getAddress().getCity());
+                    } else {
+                        // Om ingen adress finns, töm fälten för adressen
+                        arenanStreetField.clear();
+                        arenanHouseNumField.clear();
+                        arenanPostalField.clear();
+                        arenanCityField.clear();
+                    }
+
+                    // Sätt inomhus-/utomhus-val för arenan
+                    inDoorBtn.setSelected(chosenArena.isIndoor());
+                }
+            }
+        });
         // Lägg till stuff i vbox1
         hbox2.getChildren().addAll(logoutButton);
         hbox3.getChildren().addAll(addButton, updateButton, removeButton);
-        vbox.getChildren().addAll(headerLabel, arenanNameField, arenanAddressField, inDoorBtn, hbox3);
+        vbox.getChildren().addAll(headerLabel, arenaDropDown, arenanNameField, arenanStreetField, arenanHouseNumField, arenanPostalField, arenanCityField,  inDoorBtn, hbox3);
         root.getChildren().addAll(hbox2, vbox);
         return root;
     }
+
+
 
     //////////////////////////////////////      CONCERT TAB     //////////////////////////////////////
     private VBox wcConcertTab() {
