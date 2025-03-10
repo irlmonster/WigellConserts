@@ -60,7 +60,11 @@ public class WcScreen {
         VBox vbox2 = new VBox();
 
         vbox1.setPadding(new Insets(0, 0, 0, 60)); // (top, right, bottom, left)
+
+        vbox1.setPrefSize(300, 500);  // Sätter en fast storlek
+
         vbox2.setPadding(new Insets(0, 0, 0, 120)); // (top, right, bottom, left)
+        vbox2.setPrefSize(400, 500);  // Sätter en fast storlek
 
 
         // Lägg till innehåll i varje VBox
@@ -85,6 +89,10 @@ public class WcScreen {
 
 
 //////////////////////////////////////      KONSERT INFO     //////////////////////////////////////
+
+        Label label2 = new Label("Konserter");
+        label2.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+        label2.setPadding(new Insets(0, 0, 20, 35));
 
         // dropdown för konserter
         concertDropdown = new ComboBox<>();
@@ -160,7 +168,7 @@ public class WcScreen {
         hbox.getChildren().addAll(vbox1, vbox2);
 
         // Lägg till stuff i vbox1
-        vbox1.getChildren().addAll(concertDropdown, concertInfoLabel);
+        vbox1.getChildren().addAll(label2, concertDropdown, concertInfoLabel);
 
         //Lägg till stuff i vbox2
         vbox2.getChildren().addAll(customerListLabel, customersLabel);
