@@ -39,16 +39,16 @@ public class ArenaDAO {
         }
     }
 
-    //Hämta en arena (name)
+
+
     public Arena getArenaByName(String name) {
         if (name == null) {
             return null;
         }
 
         try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("FROM Arena a" +
-                            "JOIN FETCH a.address ad" +
-                            "WHERE name = :name", Arena.class)
+            return session.createQuery(
+                            "FROM Arena a JOIN FETCH a.address ad WHERE a.name = :name", Arena.class)
                     .setParameter("name", name)
                     .uniqueResult();
         } catch (Exception e) {
@@ -57,11 +57,11 @@ public class ArenaDAO {
         }
     }
 
+
     public Arena getArenaByArenaName(String name) {
         if (name == null) {
             return null;
         }
-
         try (Session session = sessionFactory.openSession()) {
             // Använd JOIN FETCH för att hämta både Arena och Address
             return session.createQuery("FROM Arena a " +
@@ -90,6 +90,8 @@ public class ArenaDAO {
             e.printStackTrace();
         }
     }
+
+
 
     //Delete - ta bort arena
     public void deleteArena(Arena arena){
