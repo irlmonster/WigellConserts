@@ -1,19 +1,25 @@
 package com.grp5.entitys;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "addresses")
 public class Addresses {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "street", nullable = false)
     private String street;
+
+    @Column(name = "house_number", nullable = false)
     private String house_number;
+
+    @Column(name = "postal_code", nullable = false)
     private String postal_code;
+
+    @Column(name = "city", nullable = false)
     private String city;
 
     public Addresses() {
@@ -61,12 +67,6 @@ public class Addresses {
 
     @Override
     public String toString() {
-        return "Addresses{" +
-                "id=" + id +
-                ", street='" + street + '\'' +
-                ", house_number=" + house_number +
-                ", postal_code=" + postal_code +
-                ", city='" + city + '\'' +
-                '}';
+        return street + " " + house_number + ", " + postal_code + " " + city;
     }
 }
