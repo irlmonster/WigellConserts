@@ -1,9 +1,6 @@
 package com.grp5.entitys;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Customer {
@@ -11,11 +8,18 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(name = "first_name", nullable = false)
     private String first_name;
+    @Column(name = "last_name", nullable = false)
     private String last_name;
+    @Column(name = "date_of_birth", nullable = false)
     private String date_of_birth;
+    @Column(name = "phone_number", nullable = false)
     private String phone_number;
-    private String address;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id", referencedColumnName = "id", nullable = false)
+    private Addresses address;  // Referens till Address-tabellen
+
 
     public Customer() {}
 
@@ -59,11 +63,11 @@ public class Customer {
         this.phone_number = phone_number;
     }
 
-    public String getAddress() {
+    public Addresses getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(Addresses address) {
         this.address = address;
     }
 
