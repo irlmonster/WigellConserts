@@ -3,23 +3,28 @@ package com.grp5.entitys;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "customers") // Kopplar till rätt tabell i databasen
 public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     @Column(name = "first_name", nullable = false)
-    private String first_name;
+    private String firstName; // Ändrat till camelCase
+
     @Column(name = "last_name", nullable = false)
-    private String last_name;
+    private String lastName;
+
     @Column(name = "date_of_birth", nullable = false)
-    private String date_of_birth;
+    private String dateOfBirth;
+
     @Column(name = "phone_number", nullable = false)
-    private String phone_number;
+    private String phoneNumber;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id", referencedColumnName = "id", nullable = false)
-    private Addresses address;  // Referens till Address-tabellen
-
+    private Addresses address;
 
     public Customer() {}
 
@@ -31,36 +36,36 @@ public class Customer {
         this.id = id;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getFirstName() { // Getter matchar variabelnamnet
+        return firstName;
     }
 
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getLast_name() {
-        return last_name;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    public String getDate_of_birth() {
-        return date_of_birth;
+    public String getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setDate_of_birth(String date_of_birth) {
-        this.date_of_birth = date_of_birth;
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
-    public String getPhone_number() {
-        return phone_number;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhone_number(String phone_number) {
-        this.phone_number = phone_number;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public Addresses getAddress() {
@@ -75,11 +80,11 @@ public class Customer {
     public String toString() {
         return "Customer{" +
                 "id=" + id +
-                ", first_name='" + first_name + '\'' +
-                ", last_name='" + last_name + '\'' +
-                ", date_of_birth=" + date_of_birth +
-                ", phone_number='" + phone_number + '\'' +
-                ", address='" + address + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", address=" + address +
                 '}';
     }
 }

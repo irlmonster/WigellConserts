@@ -24,10 +24,12 @@ public class CustomerDAO {
     public Customer getCustomerByFirstName(String firstName) {
         try (Session session = sessionFactory.openSession()) {
 
-            return session.createQuery(
-                            "FROM Customer c WHERE c.first_name = :first_name", Customer.class)
-                    .setParameter("first_name", firstName)
+            Customer customer = session.createQuery(
+                            "FROM Customer c WHERE c.firstName = :firstName", Customer.class)
+                    .setParameter("firstName", firstName)
                     .uniqueResult();
+            System.out.println(customer);
+            return customer;
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Ingen kund hittades");
@@ -70,6 +72,4 @@ public class CustomerDAO {
             e.printStackTrace();
         }
     }
-
-
 }

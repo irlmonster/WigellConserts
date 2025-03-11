@@ -36,13 +36,38 @@ public class LoginTab {
 
         // Inloggningsknapp
         Button loginButton = new Button("Logga in");
-        loginButton.setOnAction(event -> login(customer));
+        loginButton.setOnAction(event -> login());
 
         root.getChildren().addAll(headerLabel, nameField, passwordField, loginButton);
 
         // Skapa en Tab och lägg in VBox som innehåll
         loginTab = new Tab("Inloggning", root);
         loginTab.setClosable(false); // Gör så att fliken inte kan stängas
+    }
+
+    private void login() {
+        String username = nameField.getText();
+        String password = passwordField.getText();
+
+        CustomerDAO customerDAO = new CustomerDAO();
+        Customer customer = customerDAO.getCustomerByFirstName(username); // Hämtar kund från DB
+
+        System.out.println(customer);
+
+        // Om kunden finns i databasen, logga in
+        if (customer != null && password.equals("123")) {
+            fxManager.showCustomerScreen();
+            return;
+        }
+
+        // Om inloggning är som admin, logga in som admin
+        if (username.equals("Admin") && password.equals("Admin")) {
+            fxManager.showWcScreen();
+            return;
+        }
+
+        // Om inget matchar, skriv ut felmeddelande
+        System.out.println("Felaktiga inloggningsuppgifter!");
     }
 
 //    private void login() {
@@ -59,22 +84,22 @@ public class LoginTab {
 //        }
 //    }
 
-    private Customer login(Customer customer) {
-        String username = nameField.getText();
-        String password = passwordField.getText();
-        CustomerDAO customerDAO = new CustomerDAO();
-        Customer dbFirstName = customerDAO.getCustomerByFirstName(username);
-        System.out.println(dbFirstName);
-
-        if (username.equals("Admin") && password.equals("Admin")) {
-            fxManager.showWcScreen(); // Byter till WcScreen
-        } else if (username.equals(dbFirstName.getFirst_name()) && password.equals("123")) {
-            fxManager.showCustomerScreen(); // Byter till CustomerScreen
-        } else {
-            System.out.println("Felaktiga inloggningsuppgifter!");
-        }
-        return customer;
-    }
+//    private Customer login(Customer customer) {
+//        String username = nameField.getText();
+//        String password = passwordField.getText();
+//        CustomerDAO customerDAO = new CustomerDAO();
+//        Customer dbFirstName = customerDAO.getCustomerByFirstName(username);
+//        System.out.println(dbFirstName);
+//
+//        if (username.equals("Admin") && password.equals("Admin")) {
+//            fxManager.showWcScreen(); // Byter till WcScreen
+//        } else if (username.equals(dbFirstName.getFirst_name()) && password.equals("123")) {
+//            fxManager.showCustomerScreen(); // Byter till CustomerScreen
+//        } else {
+//            System.out.println("Felaktiga inloggningsuppgifter!");
+//        }
+//        return customer;
+//    }
 
 //        if (username.equals("Admin") && password.equals("Admin")) {
 //            fxManager.showWcScreen(); // Byter till WcScreen

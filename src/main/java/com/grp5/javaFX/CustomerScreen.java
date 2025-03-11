@@ -186,7 +186,7 @@ public class CustomerScreen {
         }
 
         //TA BORT DETTA!!!
-        loggedInCustomer.getFirst_name();
+        loggedInCustomer.getFirstName();
 
 
         // Skapa en bokning och sätt informationen
