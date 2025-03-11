@@ -1,10 +1,12 @@
 package com.grp5.javaFX;
 
+import DAOklasser.AddressDAO;
 import DAOklasser.ArenaDAO;
 import DAOklasser.ConcertDAO;
 import com.grp5.entitys.Addresses;
 import com.grp5.entitys.Arena;
 import com.grp5.entitys.Concerts;
+import com.mysql.cj.Session;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Label;
 import javafx.geometry.Insets;
@@ -15,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.List;
+
 
 public class WcScreen {
 
@@ -194,13 +197,29 @@ public class WcScreen {
 
 
         // Textfields
+        ComboBox<String> arenaDropDown = new ComboBox<>();
+        arenaDropDown.setPromptText("Välj arena / skapa ny...");
+        arenaDropDown.setStyle("-fx-max-width: 300px;");
+
         TextField arenanNameField = new TextField();
         arenanNameField.setPromptText("Ange arenanamn...");
         arenanNameField.setStyle("-fx-max-width: 300px;");
 
-        TextField arenanAddressField = new TextField();
-        arenanAddressField.setPromptText("Ange adress...");
-        arenanAddressField.setStyle("-fx-max-width: 300px;");
+        TextField arenanStreetField = new TextField();
+        arenanStreetField.setPromptText("Ange gata...");
+        arenanStreetField.setStyle("-fx-max-width: 300px;");
+
+        TextField arenanHouseNumField = new TextField();
+        arenanHouseNumField.setPromptText("Ange gatunummer...");
+        arenanHouseNumField.setStyle("-fx-max-width: 300px;");
+
+        TextField arenanPostalField = new TextField();
+        arenanPostalField.setPromptText("Ange postnummer...");
+        arenanPostalField.setStyle("-fx-max-width: 300px;");
+
+        TextField arenanCityField = new TextField();
+        arenanCityField.setPromptText("Ange stad...");
+        arenanCityField.setStyle("-fx-max-width: 300px;");
 
         // Lägg till radiobutton
         RadioButton inDoorBtn = new RadioButton("Markera för inomhuskonsert");
@@ -210,15 +229,192 @@ public class WcScreen {
         Label headerLabel = new Label("Wigell Conserter - Arena");
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
 
+        // Fyller listan med arena info och lägger till en ny
+        ArenaDAO arenaDAO = new ArenaDAO();
+        List<Arena> arenas = arenaDAO.getAllArenas();
+        arenaDropDown.getItems().add("- Lägg till ny arena -");
+        for (Arena a : arenas) {
+            arenaDropDown.getItems().add(a.getName());
+        }
+
+
+
         // knappar
         Button addButton = new Button("Lägg till");
-//        loginButton.setOnAction(event -> "hej");
+        addButton.setOnAction(event -> {
+            // Hämta data från fälten
+            String arenaName = arenanNameField.getText().trim();
+            String arenaStreet = arenanStreetField.getText().trim();
+            String arenaHouseNum = arenanHouseNumField.getText().trim();
+            String arenaPostal = arenanPostalField.getText().trim();
+            String arenaCity = arenanCityField.getText().trim();
+            boolean isIndoor = inDoorBtn.isSelected();
+
+            // Kontrollera att alla fält är ifyllda
+            if (arenaName.isEmpty() || arenaStreet.isEmpty() || arenaHouseNum.isEmpty() ||
+                    arenaPostal.isEmpty() || arenaCity.isEmpty()) {
+                showAlert("Fel", "Alla fält måste fyllas i", Alert.AlertType.ERROR);
+                return;
+            }
+
+            // Kontrollera att arenan inte redan finns
+            Arena existingArena = arenaDAO.getArenaByArenaName(arenaName);
+            if (existingArena != null) {
+                showAlert("Fel", "Arenan med detta namn finns redan. Använd uppdatera för att ändra!", Alert.AlertType.ERROR);
+                return;
+            }
+
+            // Skapa en ny Addresses-instans
+            Addresses newAddress = new Addresses();
+            newAddress.setStreet(arenaStreet);
+            newAddress.setHouse_number(arenaHouseNum);
+            newAddress.setPostal_code(arenaPostal);
+            newAddress.setCity(arenaCity);
+
+
+
+
+            try {
+                // Spara addressen separat (se till att din addressDAO har en metod, t.ex. saveAddress)
+                AddressDAO addressDAO = new AddressDAO();
+                addressDAO.saveAddress(newAddress);
+
+                // Skapar en ny arena med den nya adressen
+                Arena newArena = new Arena(arenaName, newAddress, isIndoor);
+
+                // Spara arenan till databasen (om cascade är konfigurerat sparas även adressen)
+                arenaDAO.saveArena(newArena);
+
+                // Uppdatera dropdown med det nya arenanamn
+                arenaDropDown.getItems().add(newArena.getName());
+
+                // Återställ fälten efter sparning
+                arenanNameField.clear();
+                arenanStreetField.clear();
+                arenanHouseNumField.clear();
+                arenanPostalField.clear();
+                arenanCityField.clear();
+                inDoorBtn.setSelected(true);
+                arenaDropDown.getSelectionModel().clearSelection();
+
+                showAlert("GREAT SUCCESS!", "✅ GREAT SUCCESS! ✅ \nArenan har lagts till i databasen!", Alert.AlertType.INFORMATION);
+            } catch (NumberFormatException e) {
+                showAlert("Fel", "Postnummer måste vara siffror!", Alert.AlertType.ERROR);
+            }
+        });
+
 
         Button updateButton = new Button("Uppdatera");
-//        loginButton.setOnAction(event -> "hej");
+        updateButton.setOnAction(event -> {
+            System.out.println("🟢 Uppdateringsknappen klickad!");
+            String selectedArena = arenaDropDown.getValue();
+
+            if(selectedArena == null){
+                showAlert("Fel", "Vänligen välj en arena du vill uppdatera", Alert.AlertType.ERROR);
+                return;
+            }
+
+            String arenaName = arenanNameField.getText().trim();
+            String arenaStreet = arenanStreetField.getText().trim();
+            String arenaHouseNum = arenanHouseNumField.getText().trim();
+            String arenaPostal = arenanPostalField.getText().trim();
+            String arenaCity = arenanCityField.getText().trim();
+            Boolean isIndoor = true;
+            inDoorBtn.setSelected(isIndoor);
+
+            if(arenaName.isEmpty() || arenaStreet.isEmpty() || arenaHouseNum.isEmpty() || arenaPostal.isEmpty() || arenaCity.isEmpty()){
+                showAlert("Fel", "Alla fält måste fyllas i", Alert.AlertType.ERROR);
+                return;
+            }
+
+            try{
+
+
+                // Hämtar vald arena från databasen
+                Arena chosenArena = arenaDAO.getArenaByName(selectedArena);
+                if (selectedArena == null) {
+                    System.out.println("❌ Arena hittades inte i databasen!");
+                } else {
+                    System.out.println("✅ Arena hittad: " + chosenArena.getName());
+                }
+
+                //Uppdaterar address och arena
+                Addresses newAddress = new Addresses();
+                newAddress.setStreet(arenaStreet);
+                newAddress.setHouse_number(arenaHouseNum);
+                newAddress.setPostal_code(arenaPostal);
+                newAddress.setCity(arenaCity);
+
+                AddressDAO addressDAO = new AddressDAO();
+                addressDAO.saveAddress(newAddress);
+
+                chosenArena.setName(arenanNameField.getText().trim());
+                chosenArena.setAddress(newAddress);
+                inDoorBtn.setSelected(isIndoor);
+
+                // Sparar uppdatering av arena
+                arenaDAO.updateArena(chosenArena);
+
+                //Uppdaterar dropdown så nya namnet är visas i dropdown
+                arenaDropDown.getItems().set(arenaDropDown.getSelectionModel().getSelectedIndex(), arenaName);
+                arenaDropDown.getSelectionModel().select(arenaName);
+
+                showAlert("Uppdaterad!", " ✅ GREAT SUCCESS! ✅ \n Borat har uppdaterat arenan: " + chosenArena.getName() +".", Alert.AlertType.INFORMATION);
+
+            } catch (NumberFormatException e){
+                showAlert("Fel", "Postnummer måste vara siffror!", Alert.AlertType.ERROR);
+            }
+
+        });
 
         Button removeButton = new Button("Ta bort");
-//        loginButton.setOnAction(event -> "hej");
+        removeButton.setOnAction(event -> {
+            String selectedArena = arenaDropDown.getValue();
+
+            // Kollar att en arena är vald
+            if(selectedArena == null || selectedArena.equals("- Lägg till ny arena -")) {
+                showAlert("Fel", "Du måste välja en arena att ta bort", Alert.AlertType.ERROR);
+                return;
+            }
+
+
+            Arena thisArena = arenaDAO.getArenaByArenaName(selectedArena);
+
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Bekräfta radering");
+            confirmAlert.setHeaderText("Är du säker på att du vill ta bort konserten?");
+            confirmAlert.setHeaderText("Denna åtgärd går inte att ångra.");
+
+            confirmAlert.showAndWait().ifPresent(response -> {
+                if(response == ButtonType.OK) {
+                    // Tar bort arenan från databasen
+                    arenaDAO.deleteArena(thisArena);
+                    // Tar bort arenan från dropdown
+                    arenaDropDown.getItems().remove(selectedArena);
+                    //Visa nästa arena i listan
+                    if(!arenaDropDown.getItems().isEmpty()) {
+                        arenaDropDown.getSelectionModel().selectFirst();
+                    } else {
+                        // Om listan är tom sätt till - Lägg till ny arena -
+                        arenaDropDown.getItems().add("- Lägg till ny arena -");
+                        arenaDropDown.getSelectionModel().select(0);
+                    }
+
+                    // rensa textfälten
+                    arenanNameField.clear();
+                    arenanStreetField.clear();
+                    arenanHouseNumField.clear();
+                    arenanPostalField.clear();
+                    arenanCityField.clear();
+                    inDoorBtn.setSelected(true);
+                    arenaDropDown.getSelectionModel().clearSelection();
+
+                    showAlert("Borttagen!", "✅ Borat kröp in i databasen och slet ut artisten " + thisArena.getName()
+                            + " ✅\nPOFF, GONE!!", Alert.AlertType.INFORMATION);
+                }
+            });
+
+        });
 
         Button logoutButton = new Button("Logga ut");
         logoutButton.setStyle("-fx-font-size: 12px;");
@@ -227,14 +423,54 @@ public class WcScreen {
             fxManager.showLoginScreen();
         });
 
+        // Uppdatera fälten efter vald arena
+        arenaDropDown.setOnAction(event -> {
+            String selectedArena = arenaDropDown.getValue();
 
+            if ("- Lägg till ny arena -".equals(selectedArena)) {
+                // Tömmer alla fält för att lägga till en ny arena
+                arenanNameField.clear();
+                arenanStreetField.clear();
+                arenanHouseNumField.clear();
+                arenanPostalField.clear();
+                arenanCityField.clear();
+                inDoorBtn.setSelected(true); // Standardval att det är inomhus då
+            } else if (selectedArena != null) {
+                // Hämtar den valda arenan från databasen via ArenaDAO
+                Arena chosenArena = arenaDAO.getArenaByArenaName(selectedArena);
+
+                if (chosenArena != null) {
+                    // Sätt arenans namn
+                    arenanNameField.setText(chosenArena.getName());
+
+                    // Sätt gatunamn från arenans adress (här antar vi att getAddress() returnerar en Address)
+                    if (chosenArena.getAddress() != null) {
+                        arenanStreetField.setText(chosenArena.getAddress().getStreet());
+                        arenanHouseNumField.setText(chosenArena.getAddress().getHouse_number());
+                        arenanPostalField.setText(chosenArena.getAddress().getPostal_code());
+                        arenanCityField.setText(chosenArena.getAddress().getCity());
+                    } else {
+                        // Om ingen adress finns, töm fälten för adressen
+                        arenanStreetField.clear();
+                        arenanHouseNumField.clear();
+                        arenanPostalField.clear();
+                        arenanCityField.clear();
+                    }
+
+                    // Sätt inomhus-/utomhus-val för arenan
+                    inDoorBtn.setSelected(chosenArena.isIndoor());
+                }
+            }
+        });
         // Lägg till stuff i vbox1
         hbox2.getChildren().addAll(logoutButton);
         hbox3.getChildren().addAll(addButton, updateButton, removeButton);
-        vbox.getChildren().addAll(headerLabel, arenanNameField, arenanAddressField, inDoorBtn, hbox3);
+        vbox.getChildren().addAll(headerLabel, arenaDropDown, arenanNameField, arenanStreetField, arenanHouseNumField, arenanPostalField, arenanCityField,  inDoorBtn, hbox3);
         root.getChildren().addAll(hbox2, vbox);
         return root;
     }
+
+
 
     //////////////////////////////////////      CONCERT TAB     //////////////////////////////////////
     private VBox wcConcertTab() {

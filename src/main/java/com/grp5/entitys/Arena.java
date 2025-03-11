@@ -13,14 +13,20 @@ public class Arena {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "address_id", nullable = false) // kopplar till adress-tabellen
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "address_id", nullable = false)
     private Addresses address;
 
     @Column(name = "indoor", nullable = false)
     private boolean indoor;
 
-    public Arena(){
+    public Arena() {
+    }
+
+    public Arena(String name, Addresses address, boolean indoor) {
+        this.name = name;
+        this.address = address;
+        this.indoor = indoor;
     }
 
     public int getId() {
@@ -60,7 +66,7 @@ public class Arena {
         return "Arena{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", address='" + address + '\'' +
+                ", address=" + address +
                 ", indoor=" + indoor +
                 '}';
     }
