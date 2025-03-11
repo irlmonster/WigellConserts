@@ -1,6 +1,7 @@
 package com.grp5.javaFX;
 
 import DAOklasser.ConcertDAO;
+import DAOklasser.CustomerDAO;
 import com.grp5.Booking;
 import com.grp5.entitys.Concerts;
 import com.grp5.entitys.Customer;
@@ -12,20 +13,23 @@ import javafx.scene.layout.VBox;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+
 import java.util.List;
 
 public class CustomerScreen {
     // Skapa TabPane (flikbehållare)
     private TabPane tabPane = new TabPane();
 
-    //TA BORT DETTA!
+    // Skapar en ny customer
     private Customer loggedInCustomer = new Customer();
 
     public TabPane getTabPane() {
         return tabPane;
     }
 
-    public CustomerScreen() {
+    public CustomerScreen(String username) {
+        CustomerDAO customerDAO = new CustomerDAO();
+        loggedInCustomer = customerDAO.getCustomerByFirstName(username);
 
         // Skapa första fliken
         Tab tabBooking = new Tab("Boka konsert");
@@ -59,6 +63,14 @@ public class CustomerScreen {
         label.setStyle("-fx-text-fill: white; -fx-font-size: 14");
         label.setMinWidth(60);
 
+        Label customerLabel = new Label("Inloggad användare: ");
+        customerLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14");
+        label.setMinWidth(60);
+
+        Label inloggedCustomerLabel = new Label("");
+        inloggedCustomerLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14");
+        inloggedCustomerLabel.setText(loggedInCustomer.getFirstName());
+
         Button btnBookConcert = new Button("Boka konsert");
         btnBookConcert.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
         btnBookConcert.setMinWidth(100);
@@ -73,7 +85,7 @@ public class CustomerScreen {
 
         textFieldTickets.textProperty().addListener((observable, oldValue, newValue) -> {
             // Uppdatera totalpriset när texten i textfältet ändras
-            double totalAmount = calculateTotalSum(textFieldTickets, comboBoxConcert, textTotalSum);
+            double totalAmount = calculateTotalSum(textFieldTickets, comboBoxConcert);
             textTotalSum.setText(String.format("%.2f", totalAmount));  // Uppdatera med två decimaler
         });
 
@@ -81,13 +93,18 @@ public class CustomerScreen {
         comboBoxConcert.setOnAction(e -> {
             String selectedConcert = comboBoxConcert.getSelectionModel().getSelectedItem().toString();
             System.out.println("Vald konsert: " + selectedConcert);
-            double totalAmount = calculateTotalSum(textFieldTickets, comboBoxConcert, textTotalSum);
+            double totalAmount = calculateTotalSum(textFieldTickets, comboBoxConcert);
             textTotalSum.setText(String.format("%.2f", totalAmount));
         });
 
         btnBookConcert.setOnAction(e -> {
-            bookConcert(comboBoxConcert, textFieldTickets);
+            String numberOfTickets = textFieldTickets.getText();
+            bookConcert(comboBoxConcert, numberOfTickets);
         });
+
+        HBox customerHbox = new HBox();
+        customerHbox.getChildren().addAll(customerLabel, inloggedCustomerLabel);
+        customerHbox.setAlignment(Pos.CENTER);
 
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER);
@@ -104,7 +121,7 @@ public class CustomerScreen {
         vBox.setSpacing(50);
         vBox.setStyle("-fx-background-color: #4682B4");
         vBox.setAlignment(Pos.CENTER);
-        vBox.getChildren().addAll(hBox, hBox2);
+        vBox.getChildren().addAll(customerHbox, hBox, hBox2);
 
         tabBooking.setContent(vBox);
 
@@ -116,38 +133,17 @@ public class CustomerScreen {
         Scene scene = new Scene(tabPane, 800, 600);
     }
 
-//    public void addConcertsToCombobox(ComboBox<Concerts> comboBoxConcert) {
-//        // Skapa SessionFactory och öppna sessionen
-//        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
-//        Session session = sessionFactory.openSession();
-//
-//        try {
-//            // Starta en transaktion
-//            session.beginTransaction();
-//
-//            // Hämta alla konserter från databasen
-//            Query<Concerts> query = session.createQuery("FROM Concerts", Concerts.class);
-//            // Skapa en lista för att lagra konserter
-//            List<Concerts> concerts = query.getResultList();
-//
-//            // Lägg till konserterna i ComboBoxen
-//            comboBoxConcert.getItems().addAll(concerts);
-//
-//            // Slutför transaktionen
-//            session.getTransaction().commit();
-//
-//            //Stäng sessionFactory och sessionen
-//            session.close();
-//            sessionFactory.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
-    public double calculateTotalSum(TextField textFieldTickets, ComboBox<Concerts> comboBoxConcert, TextField textTotalSum) {
+    public double calculateTotalSum(TextField textFieldTickets, ComboBox<Concerts> comboBoxConcert) {
         try {
-            // Läs in antal biljetter från textfältet
+            // Omvandlar antalet biljetter till int
             int numberOfTickets = Integer.parseInt(textFieldTickets.getText());
+
+            // Kontrollera om textfältet är tomt
+            if(textFieldTickets.getText().isEmpty()) {
+                System.out.println("Antal biljetter är tomt");
+                System.out.println(textFieldTickets.getText());
+            }
 
             // Kontrollera om en konsert är vald i ComboBox
             Concerts selectedConcert = comboBoxConcert.getSelectionModel().getSelectedItem();
@@ -166,7 +162,7 @@ public class CustomerScreen {
         return 0; // Om något går fel, returnera 0
     }
 
-    public void bookConcert(ComboBox<Concerts> comboBoxConcert, TextField textFieldTickets) {
+    public void bookConcert(ComboBox<Concerts> comboBoxConcert, String numberOfTickets) {
 //        // Kontrollera om en kund är inloggad
 //        if (loggedInCustomer == null) {
 //            System.out.println("Du måste vara inloggad för att boka en konsert.");
@@ -180,20 +176,16 @@ public class CustomerScreen {
         }
 
         // Läs in antal biljetter från textfältet
-        int numberOfTickets = Integer.parseInt(textFieldTickets.getText());
-        if (numberOfTickets <= 0) {
+        int tickets = Integer.parseInt(numberOfTickets);
+        if (tickets <= 0) {
             System.out.println("Vänligen ange ett giltigt antal biljetter.");
         }
-
-        //TA BORT DETTA!!!
-        loggedInCustomer.getFirstName();
-
 
         // Skapa en bokning och sätt informationen
         Booking booking = new Booking();
         booking.setConcert(selectedConcert);  // Sätt vald konsert
         booking.setCustomer(loggedInCustomer);  // Sätt inloggad kund
-        booking.setNumberOfTickets(numberOfTickets);  // Sätt antal biljetter
+        booking.setNumberOfTickets(tickets);  // Sätt antal biljetter
 
         // Spara bokningen i databasen
         saveBooking(booking);
@@ -209,7 +201,7 @@ public class CustomerScreen {
             session.beginTransaction();
 
             // Spara bokningen i databasen
-            session.save(booking);
+            session.persist(booking);
 
             // Slutför transaktionen
             session.getTransaction().commit();

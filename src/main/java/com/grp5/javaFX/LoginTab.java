@@ -56,7 +56,7 @@ public class LoginTab {
 
         // Om kunden finns i databasen, logga in
         if (customer != null && password.equals("123")) {
-            fxManager.showCustomerScreen();
+            fxManager.showCustomerScreen(username);
             return;
         }
 
