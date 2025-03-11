@@ -16,6 +16,7 @@ import org.hibernate.cfg.Configuration;
 
 import java.util.List;
 
+//Skriver detta för att kunna commita klassen
 public class CustomerScreen {
     // Skapa TabPane (flikbehållare)
     private TabPane tabPane = new TabPane();
