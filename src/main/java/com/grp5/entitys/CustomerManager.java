@@ -1,8 +1,45 @@
 package com.grp5.entitys;
-
+import DAOklasser.AddressDAO;
+import DAOklasser.CustomerDAO;
 import java.sql.*;
 
 public class CustomerManager {
+
+
+    public void registerUser(String firstName, String lastName, String birthDate, String phoneNumber,
+                             String street, String houseNumber, String postalCode, String city) {
+        try {
+            Addresses address = new Addresses();
+            address.setStreet(street);
+            address.setHouse_number(houseNumber);
+            address.setPostal_code(postalCode);
+            address.setCity(city);
+
+            AddressDAO addressDAO = new AddressDAO();
+            addressDAO.saveAddress(address);
+
+            Customer customer = new Customer();
+            customer.setFirstName(firstName);
+            customer.setLastName(lastName);
+            customer.setDateOfBirth(birthDate);
+            customer.setPhoneNumber(phoneNumber);
+            customer.setAddress(address);
+
+            CustomerDAO customerDAO = new CustomerDAO();
+            customerDAO.saveCustomer(customer);
+
+            TestFunctions.printAllCustomers();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Fel vid registrering av användare.");
+        }
+    }
+
+
+
+    /*
+
     private static final String URL = "jdbc:mysql://localhost:3306/WigellConcertsDB";
     private static final String USER = "root";
     private static final String PASSWORD = "Root";
@@ -62,5 +99,5 @@ public class CustomerManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
+    }*/
     }

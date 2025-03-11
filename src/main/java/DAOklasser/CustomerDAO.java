@@ -1,5 +1,6 @@
 package DAOklasser;
 
+import com.grp5.entitys.Addresses;
 import com.grp5.entitys.Concerts;
 import com.grp5.entitys.Customer;
 import org.hibernate.Session;
@@ -11,6 +12,24 @@ import java.util.List;
 
 public class CustomerDAO {
     private final SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+
+
+    //Create
+    //registrerar en kund
+    public void saveCustomer(Customer customer) {
+        Transaction transaction = null;
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            session.save(customer);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();     // rollback ångrar alla ändringar om något gått fel
+            }
+            e.printStackTrace();
+        }
+    }
+
 
     // READ
     //Hämta alla kunder

@@ -10,8 +10,8 @@ import org.hibernate.cfg.Configuration;
 import java.util.List;
 
 public class AddressDAO {
-    private static final SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
+    private static final SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
     // CREATE - lägg till en ny konsert
     public void saveAddress(Addresses addresses) {
