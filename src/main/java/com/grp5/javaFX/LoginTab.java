@@ -12,6 +12,7 @@ public class LoginTab {
     private TextField passwordField;
     private FxManager fxManager;
     private Tab loginTab; // Lägger till en Tab direkt i klassen
+    private Customer customer = new Customer();
 
     public LoginTab(FxManager fxManager) {
         this.fxManager = fxManager;

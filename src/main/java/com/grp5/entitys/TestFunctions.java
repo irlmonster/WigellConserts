@@ -34,4 +34,28 @@ public class TestFunctions {
             e.printStackTrace();
         }
     }
+    public static void printTickets() {
+        String sql = "SELECT * FROM wigells_concert";
+
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            System.out.println("Lista över alla kunder:");
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String Name = rs.getString("name");
+                int concertId = rs.getInt("concerts");
+                int customerId = rs.getInt("customers");
+
+                System.out.println("ID: " + id + ", Namn: " + Name + " " +
+                        ", concertId: " + concertId + ", customerId: " + customerId);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
