@@ -12,6 +12,11 @@ import java.util.List;
 public class ConcertDAO {
     private static final SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
+    public static SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+
 
     // CREATE - lägg till en ny konsert
     public void saveConcert(Concerts concert) {

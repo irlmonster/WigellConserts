@@ -22,6 +22,8 @@ import org.hibernate.cfg.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+//import static DAOklasser.ConcertDAO.sessionFactory;
+
 //Skriver detta för att kunna commita klassen
 public class CustomerScreen {
     // Skapa TabPane (flikbehållare)
@@ -132,8 +134,24 @@ public class CustomerScreen {
         });
         /// ////////////////////BOKA KONCERT KNAPP////////////////////////////////////////////////////////////////////////
         btnBookConcert.setOnAction(e -> {
-            String numberOfTickets = textFieldTickets.getText();
-            bookConcert(comboBoxConcert, numberOfTickets);
+            // Kontrollera att en konsert är vald
+            Concerts selectedConcert = (Concerts) comboBoxConcert.getSelectionModel().getSelectedItem();
+            if (selectedConcert == null) {
+                System.out.println("Vänligen välj en konsert.");
+                return;
+            }
+
+            // Hämta ID från den valda konserten och den inloggade kunden
+            int selectedConcertId = selectedConcert.getId();
+            int loggedInCustomerId = loggedInCustomer.getId();
+
+            // Anropa metoden med dessa ID:n
+            System.out.println("Bokningsförsök - Konsert ID: " + selectedConcertId + ", Kund ID: " + loggedInCustomerId);
+            bookConcert(selectedConcertId, loggedInCustomerId);
+
+
+            TestFunctions.printTickets();
+
         });
 
         btnShowBookings.setOnAction(e -> {
@@ -224,60 +242,34 @@ public class CustomerScreen {
         return 0; // Om något går fel, returnera 0
     }
 
-    public void bookConcert(ComboBox<Concerts> comboBoxConcert, String numberOfTickets) {
 
-        // Hämta den valda konserten
-        Concerts selectedConcert = comboBoxConcert.getSelectionModel().getSelectedItem();
-        if (selectedConcert == null) {
-            System.out.println("Vänligen välj en konsert.");
-            return;
-        }
+    // Exempel i CustomerScreen.bookConcert() - anpassa efter din implementation:
+    public void bookConcert(int selectedConcertId, int loggedInCustomerId) {
+        try (Session session = ConcertDAO.getSessionFactory().openSession()) {
+            // Hämta konsert och kund från databasen
+            Concerts concert = session.get(Concerts.class, selectedConcertId);
+            Customer customer = session.get(Customer.class, loggedInCustomerId);
 
-        // Läs in antal biljetter från textfältet
-        int tickets;
-        try {
-            tickets = Integer.parseInt(numberOfTickets);
-            if (tickets <= 0) {
-                System.out.println("Vänligen ange ett giltigt antal biljetter.");
+            if (concert == null || customer == null) {
+                System.out.println("Fel: Kunde inte hitta konsert eller kund i databasen.");
                 return;
             }
-        } catch (NumberFormatException ex) {
-            System.out.println("Ange ett giltigt antal biljetter.");
-            return;
-        }
-        // Skapa en bokning och sätt informationen
 
-        Concerts concert = new Concerts();
-
-        int customerID = loggedInCustomer.getId();
-        int concertID = selectedConcert.getId();
-
-        if (selectedConcert != null && loggedInCustomer != null) {
+            // Skapa och koppla WC-objektet
             WC wc = new WC();
+            wc.setConcert(concert);
+            wc.setCustomer(customer);
+            wc.setName("Biljett");
 
-            wc.setConcerts(concert);
-
-            System.out.println("\n" + concert.getId() + "\n");
-            wc.setCustomer(loggedInCustomer);
-            System.out.println("\n" + customerID + "\n");
-            wc.setName(loggedInCustomer.getFirstName());
-
+            // Spara biljetten med WC DAO
             WcDAO wcDAO = new WcDAO();
             wcDAO.createTicketWC(wc);
-
-            System.out.println("Biljett bokad för " + loggedInCustomer.getFirstName() + " till " + selectedConcert.getArtist_name());
-            TestFunctions.printTickets();
-        } else {
-            System.out.println("Välj en konsert och se till att du är inloggad!");
+            System.out.println("Biljett bokad för " + customer.getFirstName() + " till " + concert.getArtist_name());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-
-       /* // spara bokningen i en lista i minnet istället för i databasen
-        booking.addBooking(booking); // stoppar in bokningsobjektet vi skapar ovanför
-        System.out.println("Bokning skapad och sparad i minnet: " + booking);
-        WcScreen.showAlert("Bokad!", "✅ GREAT SUCCESS!!! ✅" +
-                "\nBorat har bekräftat din bokning!", Alert.AlertType.INFORMATION);*/
     }
+
 
 
 

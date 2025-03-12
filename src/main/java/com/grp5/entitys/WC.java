@@ -2,24 +2,26 @@ package com.grp5.entitys;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
+@Table(name = "wigells_concert")
 public class WC {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(nullable = false) // Gör så att namnet aldrig kan vara null i databasen
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "concerts")
-    private Concerts concerts;
+    @JoinColumn(name = "concerts", referencedColumnName = "id", nullable = false)
+    private Concerts concert;
 
     @ManyToOne
-    @JoinColumn(name = "customers")
+    @JoinColumn(name = "customers", referencedColumnName = "id", nullable = false)
     private Customer customer;
 
+    // Getters och Setters
     public int getId() {
         return id;
     }
@@ -36,17 +38,17 @@ public class WC {
         this.name = name;
     }
 
-   // public List<Concerts> getConserts() {
-    //   return concerts;
-    //}
-
-    public void setConcerts(Concerts concerts) {
-        this.concerts = concerts;
+    public Concerts getConcert() {
+        return concert;
     }
 
-    //public List<Customer> getCustomers() {
-      //  return customer;
-    //}
+    public void setConcert(Concerts concert) {
+        this.concert = concert;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
@@ -57,8 +59,8 @@ public class WC {
         return "WC{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", conserts=" + concerts +
-                ", customers=" + customer +
+                ", concert=" + concert +
+                ", customer=" + customer +
                 '}';
     }
 }
