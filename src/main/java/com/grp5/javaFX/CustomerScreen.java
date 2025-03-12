@@ -194,21 +194,38 @@ public class CustomerScreen {
         Scene scene = new Scene(tabPane, 800, 600);
     }
 
+//    private void showBookingsInLabel(Label bookedConsertsLabel) {
+//        List<Booking> customerBookings = Booking.getBookingsForCustomer(loggedInCustomer);
+//
+//        if (customerBookings.isEmpty()) {
+//            bookedConsertsLabel.setText("Du har inga bokningar.");
+//        } else {
+//            StringBuilder sb = new StringBuilder("Bokade konserter:\n");
+//
+//            for (Booking booking : customerBookings) {
+//                sb.append(booking.getConcert().getArtist_name())
+//                        .append(" - ")
+//                        .append(booking.getNumberOfTickets())
+//                        .append(" biljetter\n");
+//            }
+//
+//            bookedConsertsLabel.setText(sb.toString());
+//        }
+//    }
+
+
     private void showBookingsInLabel(Label bookedConsertsLabel) {
         List<Booking> customerBookings = Booking.getBookingsForCustomer(loggedInCustomer);
-
         if (customerBookings.isEmpty()) {
             bookedConsertsLabel.setText("Du har inga bokningar.");
         } else {
             StringBuilder sb = new StringBuilder("Bokade konserter:\n");
-
             for (Booking booking : customerBookings) {
                 sb.append(booking.getConcert().getArtist_name())
                         .append(" - ")
                         .append(booking.getNumberOfTickets())
                         .append(" biljetter\n");
             }
-
             bookedConsertsLabel.setText(sb.toString());
         }
     }
@@ -281,6 +298,11 @@ public class CustomerScreen {
                 wcDAO.createTicketWC(wc);
             }
 
+
+            // Skapa och spara bokningen i den statiska listan
+            Booking newBooking = new Booking(numberOfTickets, customer, concert);
+            newBooking.addBooking(newBooking);
+            System.out.println("Bokning sparad: " + newBooking);
 
             System.out.println("Biljett bokad för " + customer.getFirstName() + " till " + concert.getArtist_name());
         } catch (Exception e) {

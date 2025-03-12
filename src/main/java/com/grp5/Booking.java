@@ -68,7 +68,7 @@ public class Booking {
     public static List<Booking> getBookingsForCustomer(Customer customer) {
         List<Booking> customerBookings = new ArrayList<>();
         for (Booking booking : bookings) {
-            if (booking.getCustomer().equals(customer)) {
+            if (booking.getCustomer().getId() == customer.getId()) {
                 customerBookings.add(booking);
             }
         }
