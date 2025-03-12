@@ -147,7 +147,7 @@ public class CustomerScreen {
 
             // Anropa metoden med dessa ID:n
             System.out.println("Bokningsförsök - Konsert ID: " + selectedConcertId + ", Kund ID: " + loggedInCustomerId);
-            bookConcert(selectedConcertId, loggedInCustomerId);
+            bookConcert(selectedConcertId, loggedInCustomerId, textFieldTickets);
 
 
             TestFunctions.printTickets();
@@ -244,7 +244,7 @@ public class CustomerScreen {
 
 
     // Exempel i CustomerScreen.bookConcert() - anpassa efter din implementation:
-    public void bookConcert(int selectedConcertId, int loggedInCustomerId) {
+    public void bookConcert(int selectedConcertId, int loggedInCustomerId, TextField textFieldTickets) {
         try (Session session = ConcertDAO.getSessionFactory().openSession()) {
             // Hämta konsert och kund från databasen
             Concerts concert = session.get(Concerts.class, selectedConcertId);
@@ -255,15 +255,33 @@ public class CustomerScreen {
                 return;
             }
 
-            // Skapa och koppla WC-objektet
+            // Parsar antalet biljetter från TextField
+            int numberOfTickets;
+            try {
+                numberOfTickets = Integer.parseInt(textFieldTickets.getText().trim());
+                if (numberOfTickets <= 0) {
+                    System.out.println("Antalet biljetter måste vara minst 1.");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Fel: Ange endast siffror för antal biljetter.");
+                return;
+            }
+
+
+            // Spara biljetten med WC DAO
             WC wc = new WC();
+            WcDAO wcDAO = new WcDAO();
             wc.setConcert(concert);
             wc.setCustomer(customer);
             wc.setName("Biljett");
 
-            // Spara biljetten med WC DAO
-            WcDAO wcDAO = new WcDAO();
-            wcDAO.createTicketWC(wc);
+            // Skapa och koppla WC-objektet
+            for (int i = 1; i <= numberOfTickets; i++) {
+                wcDAO.createTicketWC(wc);
+            }
+
+
             System.out.println("Biljett bokad för " + customer.getFirstName() + " till " + concert.getArtist_name());
         } catch (Exception e) {
             e.printStackTrace();
