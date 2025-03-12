@@ -82,8 +82,8 @@ public class WcScreen {
 
 
         // Skapa en rubrik och en användartext
-        Label headerLabel = new Label("Wigell Conserts");
-        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+        Label headerLabel = new Label("Wigell Conserts 🎤");
+        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: white;");
 
 
 
@@ -91,12 +91,13 @@ public class WcScreen {
 
         // dropdown för konserter
         concertDropdown = new ComboBox<>();
-        concertDropdown.setPrefWidth(150);
-        concertDropdown.setStyle("-fx-spacing: 0 0 20px 0;");
+        concertDropdown.setMinWidth(100);
+        concertDropdown.setMinHeight(30);
+        concertDropdown.setStyle("-fx-background-color: white; -fx-font-size: 14;");
         concertDropdown.setPromptText("Välj Konsert");
         // label ftt visa info i
         concertInfoLabel = new Label("");
-        concertInfoLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: black;");
+        concertInfoLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: white;");
 
 
         // Fyller på dropdownen med konserter
@@ -142,8 +143,9 @@ public class WcScreen {
 //////////////////////////////////////      CUSTOMER INFO     //////////////////////////////////////
         //CustumerListLabel
         customerListLabel = new Label("Besökare");
-        customerListLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+        customerListLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;");
         customersLabel = new Label();
+        customersLabel.setStyle("-fx-font-size: 15px; -fx-text-fill: white;");
         customersLabel.setText("använd denna för att lista besökare beroende på vald arena");
 
         //
@@ -151,7 +153,9 @@ public class WcScreen {
 
 
         Button logoutButton = new Button("Logga ut");
-        logoutButton.setStyle("-fx-font-size: 12px;");
+        logoutButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        logoutButton.setMinWidth(100);
+        logoutButton.setMinHeight(30);
         logoutButton.setOnAction(event -> {
             FxManager fxManager = new FxManager((Stage) logoutButton.getScene().getWindow());
             fxManager.showLoginScreen();
@@ -198,6 +202,9 @@ public class WcScreen {
 
         // Textfields
         ComboBox<String> arenaDropDown = new ComboBox<>();
+        arenaDropDown.setMinWidth(100);
+        arenaDropDown.setMinHeight(30);
+        arenaDropDown.setStyle("-fx-background-color: white; -fx-font-size: 14");
         arenaDropDown.setPromptText("Välj arena / skapa ny...");
         arenaDropDown.setStyle("-fx-max-width: 300px;");
 
@@ -223,11 +230,12 @@ public class WcScreen {
 
         // Lägg till radiobutton
         RadioButton inDoorBtn = new RadioButton("Markera för inomhuskonsert");
+        inDoorBtn.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;");
         inDoorBtn.setSelected(true);
 
 
-        Label headerLabel = new Label("Wigell Conserter - Arena");
-        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+        Label headerLabel = new Label("Wigell Conserter - Arena 🎤");
+        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         // Fyller listan med arena info och lägger till en ny
         ArenaDAO arenaDAO = new ArenaDAO();
@@ -241,6 +249,9 @@ public class WcScreen {
 
         // knappar
         Button addButton = new Button("Lägg till");
+        addButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        addButton.setMinWidth(100);
+        addButton.setMinHeight(30);
         addButton.setOnAction(event -> {
             // Hämta data från fälten
             String arenaName = arenanNameField.getText().trim();
@@ -306,13 +317,21 @@ public class WcScreen {
 
 
         Button updateButton = new Button("Uppdatera");
+        updateButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        updateButton.setMinWidth(100);
+        updateButton.setMinHeight(30);
 //        loginButton.setOnAction(event -> "hej");
 
         Button removeButton = new Button("Ta bort");
+        removeButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        removeButton.setMinWidth(100);
+        removeButton.setMinHeight(30);
 //        loginButton.setOnAction(event -> "hej");
 
         Button logoutButton = new Button("Logga ut");
-        logoutButton.setStyle("-fx-font-size: 12px;");
+        logoutButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        logoutButton.setMinWidth(100);
+        logoutButton.setMinHeight(30);
         logoutButton.setOnAction(event -> {
             FxManager fxManager = new FxManager((Stage) logoutButton.getScene().getWindow());
             fxManager.showLoginScreen();
@@ -390,10 +409,16 @@ public class WcScreen {
 
         // Textfields
         ComboBox<String> concertDropDown = new ComboBox<>();
+        concertDropDown.setMinWidth(100);
+        concertDropDown.setMinHeight(30);
+        concertDropDown.setStyle("-fx-background-color: white; -fx-font-size: 14");
         concertDropDown.setPromptText("Välj befintlig konsert...");
         concertDropDown.setStyle("-fx-max-width: 300px;");
 
         ComboBox<String> arenaDropDown = new ComboBox<>();
+        arenaDropDown.setMinWidth(100);
+        arenaDropDown.setMinHeight(30);
+        arenaDropDown.setStyle("-fx-background-color: white; -fx-font-size: 14");
         arenaDropDown.setPromptText("Välj arena...");
         arenaDropDown.setStyle("-fx-max-width: 300px;");
 
@@ -416,6 +441,7 @@ public class WcScreen {
 
         // Lägg till radiobutton
         RadioButton inDoorBtn = new RadioButton("Markera för inomhuskonsert");
+        inDoorBtn.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;");
         inDoorBtn.setSelected(true);
 
 
@@ -438,7 +464,9 @@ public class WcScreen {
 
         //LOGGA UT - knapp
         Button logoutButton = new Button("Logga ut");
-        logoutButton.setStyle("-fx-font-size: 12px;");
+        logoutButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        logoutButton.setMinWidth(100);
+        logoutButton.setMinHeight(30);
         logoutButton.setOnAction(event -> {
             FxManager fxManager = new FxManager((Stage) logoutButton.getScene().getWindow());
             fxManager.showLoginScreen();
@@ -447,6 +475,9 @@ public class WcScreen {
         //  LÄGG TILL NY
         // lägg till-knapp och logik för CREATEknappen
         Button addButton = new Button("Skapa ny");
+        addButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        addButton.setMinWidth(100);
+        addButton.setMinHeight(30);
         addButton.setOnAction(event -> {
             // Hämta alla värden från fälten
             String artistName = artistNameField.getText().trim();
@@ -502,6 +533,9 @@ public class WcScreen {
         // UPPDATERA
         // lägg till-knapp och logik för UPDATEknappen
         Button updateButton = new Button("Uppdatera");
+        updateButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        updateButton.setMinWidth(100);
+        updateButton.setMinHeight(30);
         updateButton.setOnAction(event -> {
             System.out.println("🟢 Uppdateringsknappen klickad!");
             String selectedArtist = concertDropDown.getValue();
@@ -574,6 +608,9 @@ public class WcScreen {
 
         // lägg till-knapp och logik för DELETEknappen
         Button removeButton = new Button("Ta bort");
+        removeButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        removeButton.setMinWidth(100);
+        removeButton.setMinHeight(30);
         removeButton.setOnAction(event -> {
             String selectedArtist = concertDropDown.getValue();
 
@@ -668,8 +705,8 @@ public class WcScreen {
 
 
 
-        Label headerLabel = new Label("Wigell Conserter - Concerts");
-        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+        Label headerLabel = new Label("Wigell Conserter - Concerts 🎤");
+        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         // Lägg till stuff i vbox1
         hbox3.getChildren().addAll(addButton, updateButton, removeButton);
@@ -686,7 +723,7 @@ public class WcScreen {
 
     //////////////////////////////////////      ALERT POP-UP     //////////////////////////////////////
     // Metod för att Alert error - vi kan göra något annat om vi vill
-    private void showAlert(String title, String message, Alert.AlertType alertType) {
+    public static void showAlert(String title, String message, Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);

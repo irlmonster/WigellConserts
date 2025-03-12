@@ -2,24 +2,34 @@ package com.grp5;
 
 import com.grp5.entitys.Concerts;
 import com.grp5.entitys.Customer;
-import com.grp5.entitys.Ticket;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Booking {
     private int id;
     private int numberOfTickets;
     private Customer customer;
     private Concerts concert;
-    private Ticket ticket;
+    // static för att vi ska kunna nå den överallt
+    private static List<Booking> bookings = new ArrayList<>();
 
     public Booking() {
     }
 
-    public Booking(int id, int numberOfTickets, Customer customer, Concerts concert, Ticket ticket) {
-        this.id = id;
+    public Booking(int numberOfTickets, Customer customer, Concerts concert) {
         this.numberOfTickets = numberOfTickets;
         this.customer = customer;
         this.concert = concert;
-        this.ticket = ticket;
+    }
+
+    public void addBooking(Booking booking) {
+        bookings.add(booking);
+    }
+
+    public List<Booking> getBookings() {
+        return bookings;
     }
 
     public int getId() {
@@ -54,13 +64,18 @@ public class Booking {
         this.concert = concert;
     }
 
-    public Ticket getTicket() {
-        return ticket;
+// static för att vi ska kunna nå den överallt
+    public static List<Booking> getBookingsForCustomer(Customer customer) {
+        List<Booking> customerBookings = new ArrayList<>();
+        for (Booking booking : bookings) {
+            if (booking.getCustomer().equals(customer)) {
+                customerBookings.add(booking);
+            }
+        }
+        return customerBookings;
     }
 
-    public void setTicket(Ticket ticket) {
-        this.ticket = ticket;
-    }
+
 
     @Override
     public String toString() {
@@ -69,7 +84,6 @@ public class Booking {
                 ", numberOfTickets=" + numberOfTickets +
                 ", customer=" + customer +
                 ", concert=" + concert +
-                ", ticket=" + ticket +
                 '}';
     }
 

@@ -23,7 +23,7 @@ public class LoginTab {
         root.setAlignment(Pos.CENTER);
 
         Label headerLabel = new Label("Wigell Conserter");
-        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         // Textrutor för användarnamn och lösenord
         nameField = new TextField();
@@ -36,6 +36,9 @@ public class LoginTab {
 
         // Inloggningsknapp
         Button loginButton = new Button("Logga in");
+        loginButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        loginButton.setMinWidth(100);
+        loginButton.setMinHeight(30);
         loginButton.setOnAction(event -> login());
 
         root.getChildren().addAll(headerLabel, nameField, passwordField, loginButton);
@@ -70,45 +73,6 @@ public class LoginTab {
         System.out.println("Felaktiga inloggningsuppgifter!");
     }
 
-//    private void login() {
-//        String username = nameField.getText();
-//        String password = passwordField.getText();
-//
-//        if (username.equals("Admin") && password.equals("Admin")) {
-//            fxManager.showWcScreen(); // Byter till WcScreen
-//        } else if (username.equals("Customer") && password.equals("123")) {
-//            // Skapa WC-skärmen med dess tre flikar (WC, Arena, Konsert)
-//            fxManager.showCustomerScreen();// Byter till CustomerScreen
-//        } else {
-//            System.out.println("Felaktiga inloggningsuppgifter!");
-//        }
-//    }
-
-//    private Customer login(Customer customer) {
-//        String username = nameField.getText();
-//        String password = passwordField.getText();
-//        CustomerDAO customerDAO = new CustomerDAO();
-//        Customer dbFirstName = customerDAO.getCustomerByFirstName(username);
-//        System.out.println(dbFirstName);
-//
-//        if (username.equals("Admin") && password.equals("Admin")) {
-//            fxManager.showWcScreen(); // Byter till WcScreen
-//        } else if (username.equals(dbFirstName.getFirst_name()) && password.equals("123")) {
-//            fxManager.showCustomerScreen(); // Byter till CustomerScreen
-//        } else {
-//            System.out.println("Felaktiga inloggningsuppgifter!");
-//        }
-//        return customer;
-//    }
-
-//        if (username.equals("Admin") && password.equals("Admin")) {
-//            fxManager.showWcScreen(); // Byter till WcScreen
-//        } else if (dbFirstName.getFirst_name().equals(username) && password.equals("123")) {
-//            fxManager.showCustomerScreen();// Byter till CustomerScreen
-//        } else {
-//            System.out.println("Felaktiga inloggningsuppgifter!");
-//        }
-//        return customer;
 
 
     public Tab getTab() {
