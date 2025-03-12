@@ -1,10 +1,13 @@
 package com.grp5.javaFX;
 
+import DAOklasser.WcDAO;
 import DAOklasser.ConcertDAO;
 import DAOklasser.CustomerDAO;
 import com.grp5.Booking;
 import com.grp5.entitys.Concerts;
 import com.grp5.entitys.Customer;
+import com.grp5.entitys.TestFunctions;
+import com.grp5.entitys.WC;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -26,6 +29,7 @@ public class CustomerScreen {
 
     // Skapar en ny customer
     private Customer loggedInCustomer = new Customer();
+
 
     // En lista för att hålla bokningar
     private List<Booking> bookings = new ArrayList<>();
@@ -126,7 +130,7 @@ public class CustomerScreen {
             double totalAmount = calculateTotalSum(textFieldTickets, comboBoxConcert);
             textTotalSum.setText(String.format("%.2f", totalAmount));
         });
-
+        /// ////////////////////BOKA KONCERT KNAPP////////////////////////////////////////////////////////////////////////
         btnBookConcert.setOnAction(e -> {
             String numberOfTickets = textFieldTickets.getText();
             bookConcert(comboBoxConcert, numberOfTickets);
@@ -242,17 +246,37 @@ public class CustomerScreen {
             return;
         }
         // Skapa en bokning och sätt informationen
-        Booking booking = new Booking();
-        booking.setConcert(selectedConcert);  // Sätt vald konsert
-        booking.setCustomer(loggedInCustomer);  // Sätt inloggad kund
-        booking.setNumberOfTickets(tickets);  // Sätt antal biljetter
+
+        Concerts concert = new Concerts();
+
+        int customerID = loggedInCustomer.getId();
+        int concertID = selectedConcert.getId();
+
+        if (selectedConcert != null && loggedInCustomer != null) {
+            WC wc = new WC();
+
+            wc.setConcerts(concert);
+
+            System.out.println("\n" + concert.getId() + "\n");
+            wc.setCustomer(loggedInCustomer);
+            System.out.println("\n" + customerID + "\n");
+            wc.setName(loggedInCustomer.getFirstName());
+
+            WcDAO wcDAO = new WcDAO();
+            wcDAO.createTicketWC(wc);
+
+            System.out.println("Biljett bokad för " + loggedInCustomer.getFirstName() + " till " + selectedConcert.getArtist_name());
+            TestFunctions.printTickets();
+        } else {
+            System.out.println("Välj en konsert och se till att du är inloggad!");
+        }
 
 
-        // spara bokningen i en lista i minnet istället för i databasen
+       /* // spara bokningen i en lista i minnet istället för i databasen
         booking.addBooking(booking); // stoppar in bokningsobjektet vi skapar ovanför
         System.out.println("Bokning skapad och sparad i minnet: " + booking);
         WcScreen.showAlert("Bokad!", "✅ GREAT SUCCESS!!! ✅" +
-                "\nBorat har bekräftat din bokning!", Alert.AlertType.INFORMATION);
+                "\nBorat har bekräftat din bokning!", Alert.AlertType.INFORMATION);*/
     }
 
 

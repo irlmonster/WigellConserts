@@ -1,6 +1,7 @@
 package com.grp5.entitys;
 import DAOklasser.AddressDAO;
 import DAOklasser.CustomerDAO;
+import DAOklasser.WcDAO;
 import java.sql.*;
 
 public class CustomerManager {
@@ -16,7 +17,7 @@ public class CustomerManager {
             //kontrollerar om adressen redan är registrerad
             Addresses address = addressDAO.findAddress(street, houseNumber, postalCode, city);
 
-            // om adressen inte finns lägger vi till den i databasen
+            //om adressen inte finns lägger vi till den i databasen
             if (address == null) {
                 address = new Addresses();
                 address.setStreet(street);

@@ -12,11 +12,13 @@ public class WC {
     private int id;
     private String name;
 
-    @OneToMany()
-    private List<Concerts> conserts;
+    @ManyToOne
+    @JoinColumn(name = "concerts")
+    private Concerts concerts;
 
-    @OneToMany
-    private List<Customer> customers;
+    @ManyToOne
+    @JoinColumn(name = "customers")
+    private Customer customer;
 
     public int getId() {
         return id;
@@ -34,20 +36,20 @@ public class WC {
         this.name = name;
     }
 
-    public List<Concerts> getConserts() {
-        return conserts;
+   // public List<Concerts> getConserts() {
+    //   return concerts;
+    //}
+
+    public void setConcerts(Concerts concerts) {
+        this.concerts = concerts;
     }
 
-    public void setConserts(List<Concerts> conserts) {
-        this.conserts = conserts;
-    }
+    //public List<Customer> getCustomers() {
+      //  return customer;
+    //}
 
-    public List<Customer> getCustomers() {
-        return customers;
-    }
-
-    public void setCustomers(List<Customer> customers) {
-        this.customers = customers;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
     @Override
@@ -55,8 +57,8 @@ public class WC {
         return "WC{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", conserts=" + conserts +
-                ", customers=" + customers +
+                ", conserts=" + concerts +
+                ", customers=" + customer +
                 '}';
     }
 }
