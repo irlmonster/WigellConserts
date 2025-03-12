@@ -1,5 +1,6 @@
 package com.grp5.javaFX;
 
+import com.grp5.entitys.Customer;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -79,7 +80,26 @@ public class FxManager {
         });
     }
 
+    public void showCustomerScreen(String username){
+        tabPane.getTabs().clear(); // Rensa gamla flikar
+        tabPane.setStyle("-fx-background-color: #4682B4;");
+        // Skapa CustomerScreen med två flikar (Bokning, Inställningar)
+        CustomerScreen customerScreen = new CustomerScreen(username);
+        tabPane.getTabs().addAll(customerScreen.getTabPane().getTabs());
 
+        // **Sätt min/max bredd på flikarna**
+        tabPane.setStyle("-fx-tab-min-width: 245px; -fx-tab-max-width: 246px;");
+
+        // **Lyssnare för att ändra färg när fliken ändras**
+        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            for (Tab tab : tabPane.getTabs()) {
+                tab.setStyle("-fx-background-color: #4682B4; -fx-min-width: 150px; -fx-max-width: 200px;");
+            }
+            if (newTab != null) {
+                newTab.setStyle("-fx-background-color: #87CEFA; -fx-text-fill: white; -fx-min-width: 150px; -fx-max-width: 200px;");
+            }
+        });
+    }
 
 
 }

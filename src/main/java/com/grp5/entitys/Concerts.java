@@ -88,13 +88,6 @@ public class Concerts {
 
     @Override
     public String toString() {
-        return "Concerts{" +
-                "id=" + id +
-                ", artist_name='" + artist_name + '\'' +
-                ", date='" + date + '\'' +
-                ", ticket_price=" + ticket_price +
-                ", arena='" + arena + '\'' +
-                ", age_limit=" + age_limit +
-                '}';
+        return artist_name + " " + ticket_price;
     }
 }
