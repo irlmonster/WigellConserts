@@ -10,8 +10,8 @@ import org.hibernate.cfg.Configuration;
 import java.util.List;
 
 public class AddressDAO {
-    private static final SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
+    private static final SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
     // CREATE - lägg till en ny konsert
     public void saveAddress(Addresses addresses) {
@@ -44,6 +44,23 @@ public class AddressDAO {
             return null; // returnerar null om ingen arena hittades
         }
     }
+    //Letar upp om eftersökt adress finns
+    public Addresses findAddress(String street, String houseNumber, String postalCode, String city) {
+        Addresses foundAddress = null;
+        try (Session session = sessionFactory.openSession()) {
+            String hql = "FROM Addresses WHERE street = :street AND house_number = :houseNumber AND postal_code = :postalCode AND city = :city";
+            foundAddress = session.createQuery(hql, Addresses.class)
+                    .setParameter("street", street)
+                    .setParameter("houseNumber", houseNumber)
+                    .setParameter("postalCode", postalCode)
+                    .setParameter("city", city)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return foundAddress;
+    }
+
 
 
     //UPDATE

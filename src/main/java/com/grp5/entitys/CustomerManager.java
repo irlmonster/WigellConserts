@@ -1,66 +1,50 @@
 package com.grp5.entitys;
-
+import DAOklasser.AddressDAO;
+import DAOklasser.CustomerDAO;
 import java.sql.*;
 
 public class CustomerManager {
-    private static final String URL = "jdbc:mysql://localhost:3306/WigellConcertsDB";
-    private static final String USER = "root";
-    private static final String PASSWORD = "Root";
 
 
-
-    public static void regUser(
-            String firstname, String lastname, String birthdate, String phone,
-            String street,String houseNumber, String city, String postalCode) {
-
-        String addressSQL = "INSERT INTO addresses (street, house_number, postal_code, city) VALUES (?, ?, ?, ?)";
-        String userSQL = "INSERT INTO customers (first_name, last_name, date_of_birth, phone_number, address_id) VALUES (?, ?, ?, ?, ?)";
-
-            // Steg 1: skapa anslutning
-        try { Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Anslutningen till databasen lyckades!");
-
-                //start upp så att allt kan laddas in i databasen samtidigt
-                connection.setAutoCommit(false);
+    public void registerUser(String firstName, String lastName, String birthDate, String phoneNumber,
+                             String street, String houseNumber, String postalCode, String city) {
+        try {
 
 
-            //lägger till adressen
-            int addressId = -1;
-            try (PreparedStatement addressStmt = connection.prepareStatement(addressSQL, Statement.RETURN_GENERATED_KEYS)) {
-                addressStmt.setString(1, street);
-                addressStmt.setString(2, houseNumber);
-                addressStmt.setString(3, city);
-                addressStmt.setString(4, postalCode);
-                addressStmt.executeUpdate();
+            AddressDAO addressDAO = new AddressDAO();
 
-                try (ResultSet generatedKeys = addressStmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        addressId = generatedKeys.getInt(1);
-                    }
-                }
+            //kontrollerar om adressen redan är registrerad
+            Addresses address = addressDAO.findAddress(street, houseNumber, postalCode, city);
+
+            // om adressen inte finns lägger vi till den i databasen
+            if (address == null) {
+                address = new Addresses();
+                address.setStreet(street);
+                address.setHouse_number(houseNumber);
+                address.setPostal_code(postalCode);
+                address.setCity(city);
+
+                addressDAO.saveAddress(address);
             }
 
-            if (addressId == -1) {
-                throw new SQLException("Misslyckades med att skapa adress, inget ID returnerades.");
-            }
+            //skapar och sparar kund
+            Customer customer = new Customer();
+            customer.setFirstName(firstName);
+            customer.setLastName(lastName);
+            customer.setDateOfBirth(birthDate);
+            customer.setPhoneNumber(phoneNumber);
+            customer.setAddress(address);
+
+            CustomerDAO customerDAO = new CustomerDAO();
+            customerDAO.saveCustomer(customer);
 
 
-            //lägger till användare kopplad till adressen
-            try (PreparedStatement userStmt = connection.prepareStatement(userSQL)) {
-                userStmt.setString(1, firstname);
-                userStmt.setString(2, lastname);
-                userStmt.setString(3, birthdate);
-                userStmt.setString(4, phone);
-                userStmt.setInt(5, addressId);
-                userStmt.executeUpdate();
-            }
+            TestFunctions.printAllCustomers();
 
-            //lägger till allt till databasen
-            connection.commit();
-            System.out.println("Användare och adress registrerade!");
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Fel vid registrering av användare.");
         }
     }
-    }
+}
