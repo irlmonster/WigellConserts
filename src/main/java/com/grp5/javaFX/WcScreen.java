@@ -82,8 +82,8 @@ public class WcScreen {
 
 
         // Skapa en rubrik och en användartext
-        Label headerLabel = new Label("Wigell Conserts");
-        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+        Label headerLabel = new Label("Wigell Conserts 🎤");
+        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: white;");
 
 
 
@@ -91,12 +91,13 @@ public class WcScreen {
 
         // dropdown för konserter
         concertDropdown = new ComboBox<>();
-        concertDropdown.setPrefWidth(150);
-        concertDropdown.setStyle("-fx-spacing: 0 0 20px 0;");
+        concertDropdown.setMinWidth(100);
+        concertDropdown.setMinHeight(30);
+        concertDropdown.setStyle("-fx-background-color: white; -fx-font-size: 14;");
         concertDropdown.setPromptText("Välj Konsert");
         // label ftt visa info i
         concertInfoLabel = new Label("");
-        concertInfoLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: black;");
+        concertInfoLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: white;");
 
 
         // Fyller på dropdownen med konserter
@@ -142,8 +143,9 @@ public class WcScreen {
 //////////////////////////////////////      CUSTOMER INFO     //////////////////////////////////////
         //CustumerListLabel
         customerListLabel = new Label("Besökare");
-        customerListLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+        customerListLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;");
         customersLabel = new Label();
+        customersLabel.setStyle("-fx-font-size: 15px; -fx-text-fill: white;");
         customersLabel.setText("använd denna för att lista besökare beroende på vald arena");
 
         //
@@ -151,7 +153,9 @@ public class WcScreen {
 
 
         Button logoutButton = new Button("Logga ut");
-        logoutButton.setStyle("-fx-font-size: 12px;");
+        logoutButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        logoutButton.setMinWidth(100);
+        logoutButton.setMinHeight(30);
         logoutButton.setOnAction(event -> {
             FxManager fxManager = new FxManager((Stage) logoutButton.getScene().getWindow());
             fxManager.showLoginScreen();
@@ -198,6 +202,9 @@ public class WcScreen {
 
         // Textfields
         ComboBox<String> arenaDropDown = new ComboBox<>();
+        arenaDropDown.setMinWidth(100);
+        arenaDropDown.setMinHeight(30);
+        arenaDropDown.setStyle("-fx-background-color: white; -fx-font-size: 14");
         arenaDropDown.setPromptText("Välj arena / skapa ny...");
         arenaDropDown.setStyle("-fx-max-width: 300px;");
 
@@ -223,11 +230,12 @@ public class WcScreen {
 
         // Lägg till radiobutton
         RadioButton inDoorBtn = new RadioButton("Markera för inomhuskonsert");
+        inDoorBtn.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;");
         inDoorBtn.setSelected(true);
 
 
-        Label headerLabel = new Label("Wigell Conserter - Arena");
-        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+        Label headerLabel = new Label("Wigell Conserter - Arena 🎤");
+        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         // Fyller listan med arena info och lägger till en ny
         ArenaDAO arenaDAO = new ArenaDAO();
@@ -241,6 +249,9 @@ public class WcScreen {
 
         // knappar
         Button addButton = new Button("Lägg till");
+        addButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        addButton.setMinWidth(100);
+        addButton.setMinHeight(30);
         addButton.setOnAction(event -> {
             // Hämta data från fälten
             String arenaName = arenanNameField.getText().trim();
@@ -304,126 +315,29 @@ public class WcScreen {
         });
 
 
+
         Button updateButton = new Button("Uppdatera");
-        updateButton.setOnAction(event -> {
-            System.out.println("🟢 Uppdateringsknappen klickad!");
-            String selectedArena = arenaDropDown.getValue();
-
-            if(selectedArena == null){
-                showAlert("Fel", "Vänligen välj en arena du vill uppdatera", Alert.AlertType.ERROR);
-                return;
-            }
-
-            String arenaName = arenanNameField.getText().trim();
-            String arenaStreet = arenanStreetField.getText().trim();
-            String arenaHouseNum = arenanHouseNumField.getText().trim();
-            String arenaPostal = arenanPostalField.getText().trim();
-            String arenaCity = arenanCityField.getText().trim();
-            Boolean isIndoor = true;
-            inDoorBtn.setSelected(isIndoor);
-
-            if(arenaName.isEmpty() || arenaStreet.isEmpty() || arenaHouseNum.isEmpty() || arenaPostal.isEmpty() || arenaCity.isEmpty()){
-                showAlert("Fel", "Alla fält måste fyllas i", Alert.AlertType.ERROR);
-                return;
-            }
-
-            try{
-
-
-                // Hämtar vald arena från databasen
-                Arena chosenArena = arenaDAO.getArenaByName(selectedArena);
-                if (selectedArena == null) {
-                    System.out.println("❌ Arena hittades inte i databasen!");
-                } else {
-                    System.out.println("✅ Arena hittad: " + chosenArena.getName());
-                }
-
-                //Uppdaterar address och arena
-                Addresses newAddress = new Addresses();
-                newAddress.setStreet(arenaStreet);
-                newAddress.setHouse_number(arenaHouseNum);
-                newAddress.setPostal_code(arenaPostal);
-                newAddress.setCity(arenaCity);
-
-                AddressDAO addressDAO = new AddressDAO();
-                addressDAO.saveAddress(newAddress);
-
-                chosenArena.setName(arenanNameField.getText().trim());
-                chosenArena.setAddress(newAddress);
-                inDoorBtn.setSelected(isIndoor);
-
-                // Sparar uppdatering av arena
-                arenaDAO.updateArena(chosenArena);
-
-                //Uppdaterar dropdown så nya namnet är visas i dropdown
-                arenaDropDown.getItems().set(arenaDropDown.getSelectionModel().getSelectedIndex(), arenaName);
-                arenaDropDown.getSelectionModel().select(arenaName);
-
-                showAlert("Uppdaterad!", " ✅ GREAT SUCCESS! ✅ \n Borat har uppdaterat arenan: " + chosenArena.getName() +".", Alert.AlertType.INFORMATION);
-
-            } catch (NumberFormatException e){
-                showAlert("Fel", "Postnummer måste vara siffror!", Alert.AlertType.ERROR);
-            }
-
-        });
+        updateButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        updateButton.setMinWidth(100);
+        updateButton.setMinHeight(30);
+//        loginButton.setOnAction(event -> "hej");
 
         Button removeButton = new Button("Ta bort");
-        removeButton.setOnAction(event -> {
-            String selectedArena = arenaDropDown.getValue();
-
-            // Kollar att en arena är vald
-            if(selectedArena == null || selectedArena.equals("- Lägg till ny arena -")) {
-                showAlert("Fel", "Du måste välja en arena att ta bort", Alert.AlertType.ERROR);
-                return;
-            }
-
-
-            Arena thisArena = arenaDAO.getArenaByArenaName(selectedArena);
-
-            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmAlert.setTitle("Bekräfta radering");
-            confirmAlert.setHeaderText("Är du säker på att du vill ta bort konserten?");
-            confirmAlert.setHeaderText("Denna åtgärd går inte att ångra.");
-
-            confirmAlert.showAndWait().ifPresent(response -> {
-                if(response == ButtonType.OK) {
-                    // Tar bort arenan från databasen
-                    arenaDAO.deleteArena(thisArena);
-                    // Tar bort arenan från dropdown
-                    arenaDropDown.getItems().remove(selectedArena);
-                    //Visa nästa arena i listan
-                    if(!arenaDropDown.getItems().isEmpty()) {
-                        arenaDropDown.getSelectionModel().selectFirst();
-                    } else {
-                        // Om listan är tom sätt till - Lägg till ny arena -
-                        arenaDropDown.getItems().add("- Lägg till ny arena -");
-                        arenaDropDown.getSelectionModel().select(0);
-                    }
-
-                    // rensa textfälten
-                    arenanNameField.clear();
-                    arenanStreetField.clear();
-                    arenanHouseNumField.clear();
-                    arenanPostalField.clear();
-                    arenanCityField.clear();
-                    inDoorBtn.setSelected(true);
-                    arenaDropDown.getSelectionModel().clearSelection();
-
-                    showAlert("Borttagen!", "✅ Borat kröp in i databasen och slet ut artisten " + thisArena.getName()
-                            + " ✅\nPOFF, GONE!!", Alert.AlertType.INFORMATION);
-                }
-            });
-
-        });
+        removeButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        removeButton.setMinWidth(100);
+        removeButton.setMinHeight(30);
+//        loginButton.setOnAction(event -> "hej");
 
         Button logoutButton = new Button("Logga ut");
-        logoutButton.setStyle("-fx-font-size: 12px;");
+        logoutButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        logoutButton.setMinWidth(100);
+        logoutButton.setMinHeight(30);
         logoutButton.setOnAction(event -> {
             FxManager fxManager = new FxManager((Stage) logoutButton.getScene().getWindow());
             fxManager.showLoginScreen();
         });
 
-        // Uppdatera fälten efter vald arena
+        // Uppdatera fälten efter vald konsert
         arenaDropDown.setOnAction(event -> {
             String selectedArena = arenaDropDown.getValue();
 
@@ -495,10 +409,16 @@ public class WcScreen {
 
         // Textfields
         ComboBox<String> concertDropDown = new ComboBox<>();
+        concertDropDown.setMinWidth(100);
+        concertDropDown.setMinHeight(30);
+        concertDropDown.setStyle("-fx-background-color: white; -fx-font-size: 14");
         concertDropDown.setPromptText("Välj befintlig konsert...");
         concertDropDown.setStyle("-fx-max-width: 300px;");
 
         ComboBox<String> arenaDropDown = new ComboBox<>();
+        arenaDropDown.setMinWidth(100);
+        arenaDropDown.setMinHeight(30);
+        arenaDropDown.setStyle("-fx-background-color: white; -fx-font-size: 14");
         arenaDropDown.setPromptText("Välj arena...");
         arenaDropDown.setStyle("-fx-max-width: 300px;");
 
@@ -521,6 +441,7 @@ public class WcScreen {
 
         // Lägg till radiobutton
         RadioButton inDoorBtn = new RadioButton("Markera för inomhuskonsert");
+        inDoorBtn.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;");
         inDoorBtn.setSelected(true);
 
 
@@ -543,7 +464,9 @@ public class WcScreen {
 
         //LOGGA UT - knapp
         Button logoutButton = new Button("Logga ut");
-        logoutButton.setStyle("-fx-font-size: 12px;");
+        logoutButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        logoutButton.setMinWidth(100);
+        logoutButton.setMinHeight(30);
         logoutButton.setOnAction(event -> {
             FxManager fxManager = new FxManager((Stage) logoutButton.getScene().getWindow());
             fxManager.showLoginScreen();
@@ -552,6 +475,9 @@ public class WcScreen {
         //  LÄGG TILL NY
         // lägg till-knapp och logik för CREATEknappen
         Button addButton = new Button("Skapa ny");
+        addButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        addButton.setMinWidth(100);
+        addButton.setMinHeight(30);
         addButton.setOnAction(event -> {
             // Hämta alla värden från fälten
             String artistName = artistNameField.getText().trim();
@@ -585,6 +511,7 @@ public class WcScreen {
                 // Spara konserten i databasen
                 concertDAO.saveConcert(newConcert);
 
+
                 // Uppdatera dropdown-listan
                 concertDropDown.getItems().add(newConcert.getArtist_name());
 
@@ -606,6 +533,9 @@ public class WcScreen {
         // UPPDATERA
         // lägg till-knapp och logik för UPDATEknappen
         Button updateButton = new Button("Uppdatera");
+        updateButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        updateButton.setMinWidth(100);
+        updateButton.setMinHeight(30);
         updateButton.setOnAction(event -> {
             System.out.println("🟢 Uppdateringsknappen klickad!");
             String selectedArtist = concertDropDown.getValue();
@@ -678,6 +608,9 @@ public class WcScreen {
 
         // lägg till-knapp och logik för DELETEknappen
         Button removeButton = new Button("Ta bort");
+        removeButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        removeButton.setMinWidth(100);
+        removeButton.setMinHeight(30);
         removeButton.setOnAction(event -> {
             String selectedArtist = concertDropDown.getValue();
 
@@ -772,8 +705,8 @@ public class WcScreen {
 
 
 
-        Label headerLabel = new Label("Wigell Conserter - Concerts");
-        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+        Label headerLabel = new Label("Wigell Conserter - Concerts 🎤");
+        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         // Lägg till stuff i vbox1
         hbox3.getChildren().addAll(addButton, updateButton, removeButton);
@@ -790,7 +723,7 @@ public class WcScreen {
 
     //////////////////////////////////////      ALERT POP-UP     //////////////////////////////////////
     // Metod för att Alert error - vi kan göra något annat om vi vill
-    private void showAlert(String title, String message, Alert.AlertType alertType) {
+    public static void showAlert(String title, String message, Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);

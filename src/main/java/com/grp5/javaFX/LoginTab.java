@@ -1,5 +1,6 @@
 package com.grp5.javaFX;
 
+import DAOklasser.CustomerDAO;
 import com.grp5.entitys.Customer;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -11,6 +12,7 @@ public class LoginTab {
     private TextField passwordField;
     private FxManager fxManager;
     private Tab loginTab; // Lägger till en Tab direkt i klassen
+    private Customer customer = new Customer();
 
     public LoginTab(FxManager fxManager) {
         this.fxManager = fxManager;
@@ -21,7 +23,7 @@ public class LoginTab {
         root.setAlignment(Pos.CENTER);
 
         Label headerLabel = new Label("Wigell Conserter");
-        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+        headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         // Textrutor för användarnamn och lösenord
         nameField = new TextField();
@@ -34,6 +36,9 @@ public class LoginTab {
 
         // Inloggningsknapp
         Button loginButton = new Button("Logga in");
+        loginButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        loginButton.setMinWidth(100);
+        loginButton.setMinHeight(30);
         loginButton.setOnAction(event -> login());
 
         root.getChildren().addAll(headerLabel, nameField, passwordField, loginButton);
@@ -44,18 +49,31 @@ public class LoginTab {
     }
 
     private void login() {
-        Customer customerUser = new Customer();
         String username = nameField.getText();
         String password = passwordField.getText();
 
-        if (username.equals("Admin") && password.equals("Admin")) {
-            fxManager.showWcScreen(); // Byter till WcScreen
-        } else if (username.equals("user") && password.equals("123")) {
-            fxManager.showWcScreen(); // Byter till CustomerScreen
-        } else {
-            System.out.println("Felaktiga inloggningsuppgifter!");
+        CustomerDAO customerDAO = new CustomerDAO();
+        Customer customer = customerDAO.getCustomerByFirstName(username); // Hämtar kund från DB
+
+        System.out.println(customer);
+
+        // Om kunden finns i databasen, logga in
+        if (customer != null && password.equals("123")) {
+            fxManager.showCustomerScreen(username);
+            return;
         }
+
+        // Om inloggning är som admin, logga in som admin
+        if (username.equals("Admin") && password.equals("Admin")) {
+            fxManager.showWcScreen();
+            return;
+        }
+
+        // Om inget matchar, skriv ut felmeddelande
+        System.out.println("Felaktiga inloggningsuppgifter!");
     }
+
+
 
     public Tab getTab() {
         return loginTab; // Returnerar hela fliken

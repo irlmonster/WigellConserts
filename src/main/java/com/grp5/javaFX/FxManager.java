@@ -80,11 +80,11 @@ public class FxManager {
         });
     }
 
-    public void showCustomerScreen(){
+    public void showCustomerScreen(String username){
         tabPane.getTabs().clear(); // Rensa gamla flikar
         tabPane.setStyle("-fx-background-color: #4682B4;");
-        // Skapa WC-skärmen med dess tre flikar (WC, Arena, Konsert)
-        CustomerScreen customerScreen = new CustomerScreen();
+        // Skapa CustomerScreen med två flikar (Bokning, Inställningar)
+        CustomerScreen customerScreen = new CustomerScreen(username);
         tabPane.getTabs().addAll(customerScreen.getTabPane().getTabs());
 
         // **Sätt min/max bredd på flikarna**

@@ -20,7 +20,7 @@ public class Main extends Application {
 
         String url =  "jdbc:mysql://localhost:3306/wigellconcertsdb";
         String username = "root"; // användarnamn till databasen
-        String password = "Root";   // lösenord till databasen
+        String password = "root";   // lösenord till databasen
 
 
         launch(args); // Startar JavaFX-applikationen
