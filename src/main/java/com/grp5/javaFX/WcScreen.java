@@ -129,8 +129,8 @@ public class WcScreen {
                             (address != null) ? address.getCity() : "Okänd stad",
                             (address != null) ? address.getPostal_code() : "Okänd postkod");
 
-                // Uppdatera labeln med konsertInfo
-                concertInfoLabel.setText(concertInfo);
+                    // Uppdatera labeln med konsertInfo
+                    concertInfoLabel.setText(concertInfo);
                 } else {
                     concertInfoLabel.setText("❌ Ingen info hittades för denna konsert.");
                 }
@@ -616,8 +616,8 @@ public class WcScreen {
 
             // Kolla att en artist är valt
             if (selectedArtist == null || selectedArtist.equals("- Lägg till ny konsert -")) {
-                 showAlert("Fel", "Välj en konsert att ta bort!", Alert.AlertType.ERROR);
-                 return;
+                showAlert("Fel", "Välj en konsert att ta bort!", Alert.AlertType.ERROR);
+                return;
             }
 
             // Hämta vald konsert från databasen
