@@ -128,7 +128,6 @@ public class CustomerScreen {
         // Hantera att användaren väljer en konsert och beräkna totalsumman med metoden calculateTotalSum
         comboBoxConcert.setOnAction(e -> {
             String selectedConcert = comboBoxConcert.getSelectionModel().getSelectedItem().toString();
-            System.out.println("Vald konsert: " + selectedConcert);
             double totalAmount = calculateTotalSum(textFieldTickets, comboBoxConcert);
             textTotalSum.setText(String.format("%.2f", totalAmount));
         });
@@ -146,11 +145,11 @@ public class CustomerScreen {
             int loggedInCustomerId = loggedInCustomer.getId();
 
             // Anropa metoden med dessa ID:n
-            System.out.println("Bokningsförsök - Konsert ID: " + selectedConcertId + ", Kund ID: " + loggedInCustomerId);
+
             bookConcert(selectedConcertId, loggedInCustomerId, textFieldTickets);
 
-
-            TestFunctions.printTickets();
+            // Återställ fälten efter sparning
+            textFieldTickets.clear();
 
         });
 
@@ -194,24 +193,6 @@ public class CustomerScreen {
         Scene scene = new Scene(tabPane, 800, 600);
     }
 
-//    private void showBookingsInLabel(Label bookedConsertsLabel) {
-//        List<Booking> customerBookings = Booking.getBookingsForCustomer(loggedInCustomer);
-//
-//        if (customerBookings.isEmpty()) {
-//            bookedConsertsLabel.setText("Du har inga bokningar.");
-//        } else {
-//            StringBuilder sb = new StringBuilder("Bokade konserter:\n");
-//
-//            for (Booking booking : customerBookings) {
-//                sb.append(booking.getConcert().getArtist_name())
-//                        .append(" - ")
-//                        .append(booking.getNumberOfTickets())
-//                        .append(" biljetter\n");
-//            }
-//
-//            bookedConsertsLabel.setText(sb.toString());
-//        }
-//    }
 
 
     private void showBookingsInLabel(Label bookedConsertsLabel) {
@@ -286,16 +267,25 @@ public class CustomerScreen {
             }
 
 
-            // Spara biljetten med WC DAO
-            WC wc = new WC();
+//            // Spara biljetten med WC DAO
+//            WC wc = new WC();
+//            WcDAO wcDAO = new WcDAO();
+//            wc.setConcert(concert);
+//            wc.setCustomer(customer);
+//            wc.setName("Biljett");
+//
+//            // Skapa och koppla WC-objektet
+//            for (int i = 1; i <= numberOfTickets; i++) {
+//                wcDAO.createTicketWC(wc);
+//            }
             WcDAO wcDAO = new WcDAO();
-            wc.setConcert(concert);
-            wc.setCustomer(customer);
-            wc.setName("Biljett");
-
-            // Skapa och koppla WC-objektet
             for (int i = 1; i <= numberOfTickets; i++) {
-                wcDAO.createTicketWC(wc);
+                WC newWc = new WC();
+                newWc.setConcert(concert);
+                newWc.setCustomer(customer);
+                newWc.setName("Biljett " + i + " för " + customer.getFirstName() + " till " + concert.getArtist_name());
+                wcDAO.createTicketWC(newWc);
+                System.out.println("Biljett " + i + " bokad för " + customer.getFirstName() + " till " + concert.getArtist_name());
             }
 
 
@@ -305,6 +295,9 @@ public class CustomerScreen {
             System.out.println("Bokning sparad: " + newBooking);
 
             System.out.println("Biljett bokad för " + customer.getFirstName() + " till " + concert.getArtist_name());
+
+            WcScreen.showAlert("GREAT SUCCESS!",
+                    "✅ GREAT SUCCESS! ✅ \nBorat har tagit emot din bokning!", Alert.AlertType.INFORMATION);
         } catch (Exception e) {
             e.printStackTrace();
         }

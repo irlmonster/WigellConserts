@@ -23,7 +23,7 @@ public class ConcertDAO {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.save(concert);
+            session.persist(concert);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {

@@ -21,7 +21,7 @@ public class ArenaDAO {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()){
             transaction = session.beginTransaction();
-            session.save(arena);
+            session.persist(arena);
             transaction.commit();
         } catch(Exception e) {
             if(transaction != null) {
