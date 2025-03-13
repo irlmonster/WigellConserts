@@ -15,14 +15,13 @@ import org.hibernate.Session;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 //Skriver detta för att kunna commita klassen
 public class CustomerScreen {
     // Skapa TabPane (flikbehållare)
     private TabPane tabPane = new TabPane();
-
-
 
     // Skapar en ny customer
     private Customer loggedInCustomer = new Customer();
@@ -198,36 +197,48 @@ public class CustomerScreen {
         VBox root = new VBox(20);
         HBox hbox = new HBox(20);
 
-        root.setStyle("-fx-background-color: #4682B4;"); // Blå bakgrund
-        root.setPadding(new Insets(20)); // Lägg till padding så att färgen syns
-        root.setMinHeight(400); // Se till att det inte är för litet
-        root.setMinWidth(300); // Se till att det inte är för litet
+        root.setStyle("-fx-background-color: #4682B4;");
+        root.setPadding(new Insets(20));
+        root.setMinHeight(400);
+        root.setMinWidth(300);
 
-        ComboBox comboBoxConcert = new ComboBox();
+        ComboBox<String> comboBoxConcert = new ComboBox<>();
         comboBoxConcert.setPromptText("Konsert");
         comboBoxConcert.setMinWidth(200);
         comboBoxConcert.setMinHeight(30);
         comboBoxConcert.setStyle("-fx-background-color: white; -fx-font-size: 14");
 
-        Label consertTrip = new Label("Annordnade resor till konserter");
-        consertTrip.setStyle("-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold; ");
+        Label concertTrip = new Label("Annordnade resor till konserter");
+        concertTrip.setStyle("-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold;");
 
-
-        Label bookedConsertsLabel = new Label("Inga bokade konserter");
+        Label bookedConsertsLabel = new Label("");
         bookedConsertsLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16");
 
+        // Hämta konserter från databasen
+        ConcertDAO concertDAO = new ConcertDAO();
+        List<Concerts> concerts = concertDAO.getAllConcerts();
+        for (Concerts c : concerts) {
+            comboBoxConcert.getItems().add(c.getArtist_name());
+        }
 
-
-
-
-
-
-
+        // När en konsert väljs kan du exempelvis visa namnet i en label
+        comboBoxConcert.setOnAction(event -> {
+            String selectedArtist = comboBoxConcert.getSelectionModel().getSelectedItem();
+            if (selectedArtist != null) {
+                Concerts selectedConcert = concertDAO.getConcertByArtist(selectedArtist);
+                if (selectedConcert != null) {
+                    showBusInfo(loggedInCustomer, selectedConcert, bookedConsertsLabel);
+                } else {
+                    bookedConsertsLabel.setText("Ingen konsert hittades för artist: " + selectedArtist);
+                }
+            }
+        });
 
         hbox.getChildren().addAll(comboBoxConcert, bookedConsertsLabel);
-        root.getChildren().addAll(consertTrip, hbox);
+        root.getChildren().addAll(concertTrip, hbox);
         return root;
     }
+
 
     private void showBookingsInLabel(Label bookedConsertsLabel) {
         List<Booking> customerBookings = Booking.getBookingsForCustomer(loggedInCustomer);
@@ -326,7 +337,26 @@ public class CustomerScreen {
         }
     }
 
+    public void showBusInfo(Customer loggedInCustomer, Concerts selectedConcert, Label bookedConsertsLabel) {
+        if (loggedInCustomer != null && selectedConcert != null) {
+            // Hämta staden via kundens adress
+            Addresses address = loggedInCustomer.getAddress();
+            String city = (address != null) ? address.getCity() : "Okänd stad";
 
+            // Hämta konsertnamn
+            String artistName = selectedConcert.getArtist_name();
+            String artistDate = selectedConcert.getDate();
 
+            // Skapa texten
+            String bussresa = "Från din hemstad " + city + " går en konsertbuss kl 09.00, " + artistDate +
+                    ".\nFrån centralstationen till "+ artistName + " konserten.";
+
+            // Sätt texten på labeln
+            bookedConsertsLabel.setText(bussresa);
+        } else {
+            bookedConsertsLabel.setText("Välj en konsert och se till att du är inloggad!");
+        }
+
+    }
 
 }

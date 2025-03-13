@@ -24,9 +24,6 @@ public class ArenaDAO {
             session.persist(arena);
             transaction.commit();
         } catch(Exception e) {
-            if(transaction != null) {
-                transaction.rollback();
-            }
             e.printStackTrace();
         }
     }

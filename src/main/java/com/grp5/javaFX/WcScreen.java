@@ -116,7 +116,7 @@ public class WcScreen {
         }
 
 
-        Button deleteCstmrChosenConcertBtn = new Button("Aboka till koncert");
+        Button deleteCstmrChosenConcertBtn = new Button("Avboka till koncert");
         deleteCstmrChosenConcertBtn.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
         deleteCstmrChosenConcertBtn.setMinWidth(100);
         deleteCstmrChosenConcertBtn.setMinHeight(30);
@@ -713,7 +713,8 @@ public class WcScreen {
                 inDoorBtn.setSelected(true);
                 arenaDropDown.getSelectionModel().clearSelection();
 
-                showAlert("GREAT SUCCESS!", "✅ GREAT SUCCESS! ✅ \nBorat har lagt till konserten i databasen!", Alert.AlertType.INFORMATION);
+                showAlert("GREAT SUCCESS!", "✅ GREAT SUCCESS! ✅ " +
+                        "\nBorat har lagt till konserten i databasen!", Alert.AlertType.INFORMATION);
 
             } catch (NumberFormatException e) {
                 showAlert("Fel", "Pris och åldersgräns måste vara siffror!", Alert.AlertType.ERROR);

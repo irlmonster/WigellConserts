@@ -10,8 +10,6 @@ public class CustomerManager {
     public void registerUser(String firstName, String lastName, String birthDate, String phoneNumber,
                              String street, String houseNumber, String postalCode, String city) {
         try {
-
-
             AddressDAO addressDAO = new AddressDAO();
 
             //kontrollerar om adressen redan är registrerad
