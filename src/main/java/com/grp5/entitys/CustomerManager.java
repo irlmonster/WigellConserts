@@ -34,6 +34,9 @@ public class CustomerManager {
             customer.setPhoneNumber(phoneNumber);
             customer.setAddress(address);
 
+            System.out.println(customer);
+            System.out.println("\n" + address);
+
             CustomerDAO customerDAO = new CustomerDAO();
             customerDAO.saveCustomer(customer);
 
