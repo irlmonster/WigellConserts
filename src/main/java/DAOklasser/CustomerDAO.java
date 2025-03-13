@@ -58,7 +58,6 @@ public class CustomerDAO {
     }
 
 
-
     // UPDATE
     public void updateCustomer(Customer customer) {
         Transaction transaction = null;

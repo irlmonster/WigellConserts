@@ -71,7 +71,6 @@ public class RegNewUserTab {
 
         root.getChildren().addAll(headerLabel, firstnameField, lastnameField, birthdateField, phoneNumberField, streetField, houseNumberField, postalCodeField, cityField, registerButton);
 
-
         regTab = new Tab("Registrera användare", root);
     }
 
@@ -87,14 +86,11 @@ public class RegNewUserTab {
             String postalCode = postalCodeField.getText();
             String city = cityField.getText();
 
-
-
             List<String> fields = List.of(firstName, lastName, birthDate, phoneNumber, street, houseNumber, postalCode, city);
             boolean emptyField = fields.stream().anyMatch(String::isEmpty);
 
             //ifall att något fält inte är ifyllt
             if(emptyField) {
-
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Fel!");
                 alert.setHeaderText("Alla fält måste fyllas i");
@@ -104,7 +100,6 @@ public class RegNewUserTab {
                 CustomerManager customerManager = new CustomerManager();
                 customerManager.registerUser(firstName, lastName, birthDate, phoneNumber, street, houseNumber, postalCode, city);
                 fxManager.showLoginScreen();
-
                 WcScreen.showAlert("GREAT SUCCESS!",
                         "✅ GREAT SUCCESS! ✅ \nBorat har registrerat den nya användaren!", Alert.AlertType.INFORMATION);
             }

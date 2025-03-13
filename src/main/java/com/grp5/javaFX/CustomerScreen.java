@@ -1,13 +1,8 @@
 package com.grp5.javaFX;
 
-import DAOklasser.WcDAO;
-import DAOklasser.ConcertDAO;
-import DAOklasser.CustomerDAO;
+import DAOklasser.*;
 import com.grp5.Booking;
-import com.grp5.entitys.Concerts;
-import com.grp5.entitys.Customer;
-import com.grp5.entitys.TestFunctions;
-import com.grp5.entitys.WC;
+import com.grp5.entitys.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -16,18 +11,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
-//import static DAOklasser.ConcertDAO.sessionFactory;
 
 //Skriver detta för att kunna commita klassen
 public class CustomerScreen {
     // Skapa TabPane (flikbehållare)
     private TabPane tabPane = new TabPane();
+
+
 
     // Skapar en ny customer
     private Customer loggedInCustomer = new Customer();
@@ -186,14 +181,53 @@ public class CustomerScreen {
         tabBooking.setContent(vBox);
 
         Tab tabSettings = new Tab("Inställningar");
-        tabSettings.setClosable(false); // Gör så att användaren inte kan stänga fliken
+        tabSettings.setClosable(false);
         tabSettings.setStyle("-fx-font-size: 16px;");
 
-        tabPane.getTabs().addAll(tabBooking, tabSettings);
+
+        Tab tabTravel = new Tab("Konsertresor");
+        tabTravel.setClosable(false);
+        tabTravel.setStyle("-fx-font-size: 16px;");
+        tabTravel.setContent(tabTravel()); // Lägg till innehåll i fliken
+
+        tabPane.getTabs().addAll(tabBooking, tabTravel, tabSettings);
         Scene scene = new Scene(tabPane, 800, 600);
     }
 
+    private VBox tabTravel() {
+        VBox root = new VBox(20);
+        HBox hbox = new HBox(20);
 
+        root.setStyle("-fx-background-color: #4682B4;"); // Blå bakgrund
+        root.setPadding(new Insets(20)); // Lägg till padding så att färgen syns
+        root.setMinHeight(400); // Se till att det inte är för litet
+        root.setMinWidth(300); // Se till att det inte är för litet
+
+        ComboBox comboBoxConcert = new ComboBox();
+        comboBoxConcert.setPromptText("Konsert");
+        comboBoxConcert.setMinWidth(200);
+        comboBoxConcert.setMinHeight(30);
+        comboBoxConcert.setStyle("-fx-background-color: white; -fx-font-size: 14");
+
+        Label consertTrip = new Label("Annordnade resor till konserter");
+        consertTrip.setStyle("-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold; ");
+
+
+        Label bookedConsertsLabel = new Label("Inga bokade konserter");
+        bookedConsertsLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16");
+
+
+
+
+
+
+
+
+
+        hbox.getChildren().addAll(comboBoxConcert, bookedConsertsLabel);
+        root.getChildren().addAll(consertTrip, hbox);
+        return root;
+    }
 
     private void showBookingsInLabel(Label bookedConsertsLabel) {
         List<Booking> customerBookings = Booking.getBookingsForCustomer(loggedInCustomer);
@@ -267,17 +301,6 @@ public class CustomerScreen {
             }
 
 
-//            // Spara biljetten med WC DAO
-//            WC wc = new WC();
-//            WcDAO wcDAO = new WcDAO();
-//            wc.setConcert(concert);
-//            wc.setCustomer(customer);
-//            wc.setName("Biljett");
-//
-//            // Skapa och koppla WC-objektet
-//            for (int i = 1; i <= numberOfTickets; i++) {
-//                wcDAO.createTicketWC(wc);
-//            }
             WcDAO wcDAO = new WcDAO();
             for (int i = 1; i <= numberOfTickets; i++) {
                 WC newWc = new WC();

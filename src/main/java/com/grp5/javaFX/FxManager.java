@@ -88,7 +88,7 @@ public class FxManager {
         tabPane.getTabs().addAll(customerScreen.getTabPane().getTabs());
 
         // **Sätt min/max bredd på flikarna**
-        tabPane.setStyle("-fx-tab-min-width: 355px; -fx-tab-max-width: 356px;");
+        tabPane.setStyle("-fx-tab-min-width: 245px; -fx-tab-max-width: 246px;");
 
         // **Lyssnare för att ändra färg när fliken ändras**
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {

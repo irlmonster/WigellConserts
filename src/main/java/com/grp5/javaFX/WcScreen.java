@@ -1,15 +1,12 @@
 package com.grp5.javaFX;
 
 import DAOklasser.*;
-import com.grp5.Booking;
 import com.grp5.entitys.*;
-import com.mysql.cj.Session;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Label;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -66,11 +63,9 @@ public class WcScreen {
         vbox2.setPadding(new Insets(0, 0, 0, 70)); // (top, right, bottom, left)
         vbox3.setPadding(new Insets(35, 20, 0, 80)); // (top, right, bottom, left)
 
-
         // Lägg till innehåll i varje VBox
         vbox1.getChildren().add(new Label());
         vbox2.getChildren().add(new Label());
-
 
         // Skapa en HBox för att placera de två VBox-arna bredvid varandra
         HBox hbox = new HBox(10);
@@ -80,7 +75,6 @@ public class WcScreen {
         HBox hbox2 = new HBox();
         hbox2.setStyle("-fx-padding: 10 0 0 700px;"); //top, right, bottom, left
         hbox.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
-
 
         // Skapa en rubrik och en användartext
         Label headerLabel = new Label("Wigell Conserts 🎤");
@@ -94,9 +88,7 @@ public class WcScreen {
         customersLabel.setText("");
 
 
-
 //////////////////////////////////////      KONSERT INFO     //////////////////////////////////////
-
         // dropdown för konserter
         concertDropdown = new ComboBox<>();
         concertDropdown.setMinWidth(150);
@@ -248,11 +240,6 @@ public class WcScreen {
 
 //////////////////////////////////////      CUSTOMER INFO     //////////////////////////////////////
 
-
-        //
-
-
-
         Button logoutButton = new Button("Logga ut");
         logoutButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
         logoutButton.setMinWidth(100);
@@ -287,7 +274,7 @@ public class WcScreen {
     private VBox wcArenaTab() {
         VBox root = new VBox(20);
         root.setStyle("-fx-font-size: 12px; -fx-padding: 0 0 0 0px;");
-        root.setStyle("-fx-background-color: #4682B4;"); // Grön bakgrund för Arena
+        root.setStyle("-fx-background-color: #4682B4;");
 
         VBox vbox = new VBox(10);
         vbox.setAlignment(Pos.CENTER);
@@ -588,8 +575,6 @@ public class WcScreen {
         root.getChildren().addAll(hbox2, vbox);
         return root;
     }
-
-
 
     //////////////////////////////////////      CONCERT TAB     //////////////////////////////////////
     private VBox wcConcertTab() {
@@ -935,6 +920,5 @@ public class WcScreen {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
 
 }
