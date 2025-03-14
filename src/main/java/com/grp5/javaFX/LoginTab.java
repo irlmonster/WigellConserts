@@ -16,7 +16,6 @@ public class LoginTab {
 
     public LoginTab(FxManager fxManager) {
         this.fxManager = fxManager;
-
         // Skapa en VBox för inloggningsinnehållet
         VBox root = new VBox(20);
         root.setStyle("-fx-background-color: #4682B4;");
@@ -47,14 +46,11 @@ public class LoginTab {
     }
 
     private void login() {
-
         String username = nameField.getText();
         String password = passwordField.getText();
 
         CustomerDAO customerDAO = new CustomerDAO();
         Customer customer = customerDAO.getCustomerByFirstName(username); // Hämtar kund från DB
-
-        System.out.println(customer);
 
         // Om kunden finns i databasen, logga in
         if (customer != null && password.equals("123")) {
@@ -67,12 +63,9 @@ public class LoginTab {
             fxManager.showWcScreen();
             return;
         }
-
         // Om inget matchar, skriv ut felmeddelande
         System.out.println("Felaktiga inloggningsuppgifter!");
     }
-
-
 
     public Tab getTab() {
         return loginTab; // Returnerar hela fliken

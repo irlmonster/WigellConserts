@@ -14,7 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
-import javax.swing.*;
+
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +27,6 @@ public class WcScreen {
 
     public WcScreen() {
         tabPane = new TabPane();
-
         // Skapa flikarna
         Tab wcTab = new Tab("WC", wcTab());
         Tab arenaTab = new Tab("Arena", wcArenaTab());
@@ -38,19 +37,13 @@ public class WcScreen {
         arenaTab.setClosable(false);
         concertTab.setClosable(false);
 
-
-
         // Lägg till flikarna i TabPane
         tabPane.getTabs().addAll(wcTab, arenaTab, concertTab);
-
-//        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
-//            if (newTab.getText().equals("Konsert")) {
-//                updateArenaDropdownForConcerts(arenaDropDown);
-//            }
-//        });
-
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////      WC TAB     //////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////
     private VBox wcTab() {
         VBox root;
         ComboBox<String> concertDropdown;
@@ -64,7 +57,6 @@ public class WcScreen {
 
         root = new VBox(20);
         root.setStyle("-fx-background-color: #4682B4;");
-//        root.setAlignment(Pos.CENTER);
 
         // Skapa vbox
         VBox vbox1 = new VBox(20);
@@ -99,8 +91,9 @@ public class WcScreen {
         customersLabel.setStyle("-fx-font-size: 15px; -fx-text-fill: white;");
         customersLabel.setText("");
 
-
-//////////////////////////////////////      KONSERT INFO     //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////      KONSERT INFO     /////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
         // dropdown för konserter
         concertDropdown = new ComboBox<>();
         concertDropdown.setMinWidth(150);
@@ -111,7 +104,6 @@ public class WcScreen {
         concertInfoLabel = new Label("");
         concertInfoLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: white;");
 
-
         ComboBox<String> customerDropdown;
         customerDropdown = new ComboBox<>();
         customerDropdown.setMinWidth(110);
@@ -119,14 +111,11 @@ public class WcScreen {
         customerDropdown.setStyle("-fx-background-color: white; -fx-font-size: 14;");
         customerDropdown.setPromptText("Välj kund");
 
-
-
         CustomerDAO customerDAO = new CustomerDAO();
         List<Customer> customers = customerDAO.getAllCustomers();
         for (Customer c : customers) {
             customerDropdown.getItems().add(c.getFirstName());
         }
-
 
         Button deleteCstmrChosenConcertBtn = new Button("Avboka till koncert");
         deleteCstmrChosenConcertBtn.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
@@ -161,17 +150,15 @@ public class WcScreen {
 
             showAlert("Borttagen", "Alla biljetter för " + selectedCustomer.getFirstName() +
                     " till konsert " + selectedConcert.getArtist_name() + " har tagits bort!", Alert.AlertType.INFORMATION);
-
-            // Eventuellt: Uppdatera customersLabel med aktuell info, t.ex. genom att anropa samma logik som i din concertDropdown.onAction
         });
 
 
 
-        Button deleteCstmrBtn = new Button("Avboka alla");
-        deleteCstmrBtn.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
-        deleteCstmrBtn.setMinWidth(100);
-        deleteCstmrBtn.setMinHeight(30);
-        deleteCstmrBtn.setOnAction(event -> {
+        Button deleteAllCstmrTcktBtn = new Button("Avboka alla");
+        deleteAllCstmrTcktBtn.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        deleteAllCstmrTcktBtn.setMinWidth(100);
+        deleteAllCstmrTcktBtn.setMinHeight(30);
+        deleteAllCstmrTcktBtn.setOnAction(event -> {
             String selectedCustomerName = customerDropdown.getValue();
             if (selectedCustomerName == null || selectedCustomerName.isEmpty()) {
                 showAlert("Fel", "Välj en kund!", Alert.AlertType.ERROR);
@@ -189,6 +176,16 @@ public class WcScreen {
                     , Alert.AlertType.INFORMATION);
         });
 
+
+
+        // Ta bort kundknapp
+        Button deleteCstmrBtn = new Button("Ta bort användare");
+        deleteCstmrBtn.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        deleteCstmrBtn.setOnAction(event -> {
+            Customer selectedCustomerName = customerDAO.getCustomerByFirstName(customerDropdown.getValue());
+            showAlert("DELETE!", " ✅ HIGH FIVE! ✅ \nBorat har tagit bort användaren!", Alert.AlertType.INFORMATION);
+            customerDAO.deleteCustomer(selectedCustomerName);
+        });
 
         // Fyller på dropdownen med konserter
         ConcertDAO concertDAO = new ConcertDAO();
@@ -245,13 +242,12 @@ public class WcScreen {
                     customersLabel.setText("");
                 }
             }
-
         });
 
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////      CUSTOMER INFO     //////////////////////////////////////
-
+////////////////////////////////////////////////////////////////////////////////////////////////////
         Button logoutButton = new Button("Logga ut");
         logoutButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
         logoutButton.setMinWidth(100);
@@ -260,29 +256,18 @@ public class WcScreen {
             FxManager fxManager = new FxManager((Stage) logoutButton.getScene().getWindow());
             fxManager.showLoginScreen();
         });
-
-        //  Lägg till stuff i hbox
         hbox.getChildren().addAll(vbox1, vbox2, vbox3);
-
-        // Lägg till stuff i vbox1
         vbox1.getChildren().addAll(concertDropdown, concertInfoLabel);
-
-        //Lägg till stuff i vbox2
         vbox2.getChildren().addAll(customerListLabel, customersLabel);
-
-        //Lägg till stuff i vbox3
-        vbox3.getChildren().addAll(customerDropdown, deleteCstmrBtn, deleteCstmrChosenConcertBtn);
-
-        //Lägg till stuff i vboxMid
+        vbox3.getChildren().addAll(customerDropdown, deleteAllCstmrTcktBtn, deleteCstmrChosenConcertBtn, deleteCstmrBtn);
         vboxMid.getChildren().addAll(hbox2, headerLabel);
         hbox2.getChildren().addAll(logoutButton);
-
-        // Lägg till alla element i den överordnade VBoxen
         root.getChildren().addAll(vboxMid,hbox);
         return root;
     }
-
+    //////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////      ARENA TAB     //////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////
     private VBox wcArenaTab() {
         VBox root = new VBox(20);
         root.setStyle("-fx-font-size: 12px; -fx-padding: 0 0 0 0px;");
@@ -332,7 +317,6 @@ public class WcScreen {
         inDoorBtn.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;");
         inDoorBtn.setSelected(true);
 
-
         Label headerLabel = new Label("Wigell Conserter - Arena 🎤");
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: white;");
 
@@ -343,10 +327,6 @@ public class WcScreen {
         for (Arena a : arenas) {
             arenaDropDown.getItems().add(a.getName());
         }
-
-
-
-
 
         // knappar
         Button addButton = new Button("Lägg till");
@@ -404,15 +384,11 @@ public class WcScreen {
             }
         });
 
-
-
-
         Button updateButton = new Button("Uppdatera");
         updateButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
         updateButton.setMinWidth(100);
         updateButton.setMinHeight(30);
         updateButton.setOnAction(event -> {
-            System.out.println("🟢 Uppdateringsknappen klickad!");
             arenaDropDown.getValue();
             String selectedArena = arenaDropDown.getValue();
 
@@ -495,10 +471,6 @@ public class WcScreen {
                 showAlert("Fel", "Kan inte ta bort arenan, den används i " + count + " konserter!", Alert.AlertType.ERROR);
                 return;
             }
-
-
-
-
 
             Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
             confirmAlert.setTitle("Bekräfta radering");
@@ -591,8 +563,9 @@ public class WcScreen {
         root.getChildren().addAll(hbox2, vbox);
         return root;
     }
-
+    //////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////      CONCERT TAB     //////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
     private VBox wcConcertTab() {
 
         VBox root = new VBox(20);
@@ -804,7 +777,8 @@ public class WcScreen {
                 // Sätt om vald konsert för att uppdatera displayen
                 concertDropDown.getSelectionModel().select(selectedConcert);
 
-                showAlert("Uppdaterad!", " ✅ GREAT SUCCESS! ✅ \n Borat har uppdaterat konserten för artisten: " + selectedConcert.getArtist_name() +".", Alert.AlertType.INFORMATION);
+                showAlert("Uppdaterad!", " ✅ GREAT SUCCESS! ✅ " +
+                        "\n Borat har uppdaterat konserten för artisten: " + selectedConcert.getArtist_name() +".", Alert.AlertType.INFORMATION);
 
 
             } catch (NumberFormatException e) {
@@ -812,8 +786,6 @@ public class WcScreen {
             }
 
         });
-
-
 
 
         // lägg till-knapp och logik för DELETEknappen
@@ -867,12 +839,6 @@ public class WcScreen {
 
         });
 
-
-
-
-
-
-
         // Uppdatera fälten efter vald konsert
         concertDropDown.setOnAction(event -> {
             Concerts selectedConcert = concertDropDown.getSelectionModel().getSelectedItem();
@@ -895,8 +861,6 @@ public class WcScreen {
                 }
             }
         });
-
-
 
         Label headerLabel = new Label("Wigell Conserter - Concerts 🎤");
         headerLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: white;");

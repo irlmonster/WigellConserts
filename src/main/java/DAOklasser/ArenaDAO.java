@@ -17,21 +17,6 @@ import java.util.List;
 public class ArenaDAO {
     private final SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
- /*   //Create - lägga till ny arena
-    public void saveArena(Arena arena) {
-        Transaction transaction = null;
-        try {Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.persist(arena);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();     // rollback ångrar alla ändringar om något gått fel
-            }
-            e.printStackTrace();
-        }
-
-    }*/
 
     public void saveArena(Arena arena) {
         Transaction transaction = null;

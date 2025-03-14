@@ -74,6 +74,24 @@ public class CustomerDAO {
         }
     }
 
+    // Uppdatera customer och address
+    public void updateCustomerSettings(Customer customer, Addresses address) {
+        Session session = sessionFactory.openSession();
+        try {
+            session.beginTransaction();
+            // Uppdatera adress
+            session.merge(address);
+            // Sätt adress i customer
+            customer.setAddress(address);
+            // Uppdatera customer
+            session.merge(customer);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     // DELETE
     public void deleteCustomer(Customer customer) {
         Transaction transaction = null;

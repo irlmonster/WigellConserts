@@ -1,13 +1,9 @@
 package com.grp5.javaFX;
 
-import com.grp5.entitys.Addresses;
-import com.grp5.entitys.CustomerManager;
-import com.grp5.entitys.TestFunctions;
+import com.grp5.CustomerManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import DAOklasser.AddressDAO;
-import DAOklasser.CustomerDAO;
 
 import java.util.List;
 

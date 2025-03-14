@@ -1,5 +1,6 @@
 package DAOklasser;
 
+import com.grp5.entitys.Arena;
 import com.grp5.entitys.Concerts;
 import com.grp5.entitys.Customer;
 import org.hibernate.Session;
@@ -105,17 +106,14 @@ public class WcDAO {
         return ticketsMap;
     }
 
-
-
-
     // UPDATE
-    public void updateCustomer(Customer customer) {
+    public void updateArena(Arena arena) {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.merge(customer); //MERGE istället för update?
+            session.merge(arena); //MERGE istället för update?
             transaction.commit();
-            System.out.println("Kunden har sparats");
+            System.out.println("Arenan har uppdaterats");
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();     // rollback ångrar alla ändringar om något gått fel
@@ -123,8 +121,6 @@ public class WcDAO {
             e.printStackTrace();
         }
     }
-
-
 
     // DELETE
     public void deleteTicketsForCustomerAndConcert(Customer customer, Concerts concert) {
@@ -172,7 +168,5 @@ public class WcDAO {
             e.printStackTrace();
         }
     }
-
-
 
 }

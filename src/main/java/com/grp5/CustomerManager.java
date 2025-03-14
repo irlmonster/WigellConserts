@@ -1,8 +1,8 @@
-package com.grp5.entitys;
+package com.grp5;
 import DAOklasser.AddressDAO;
 import DAOklasser.CustomerDAO;
-import DAOklasser.WcDAO;
-import java.sql.*;
+import com.grp5.entitys.Addresses;
+import com.grp5.entitys.Customer;
 
 public class CustomerManager {
 
@@ -40,8 +40,6 @@ public class CustomerManager {
             CustomerDAO customerDAO = new CustomerDAO();
             customerDAO.saveCustomer(customer);
 
-
-            TestFunctions.printAllCustomers();
 
 
         } catch (Exception e) {
