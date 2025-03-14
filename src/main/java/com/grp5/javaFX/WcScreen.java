@@ -2,6 +2,8 @@ package com.grp5.javaFX;
 
 import DAOklasser.*;
 import com.grp5.entitys.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Label;
 import javafx.geometry.Insets;
@@ -10,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 import javax.swing.*;
 import java.util.List;
@@ -19,8 +22,8 @@ import java.util.Map;
 public class WcScreen {
 
     private TabPane tabPane; // TabPane för alla flikar
-
-    private ComboBox<String> arenaDropDown = new ComboBox<>();
+    private ObservableList<String> arenaObservableList = FXCollections.observableArrayList();
+    private ComboBox<String> arenaDropDown = new ComboBox<>(arenaObservableList);
 
     public WcScreen() {
         tabPane = new TabPane();
@@ -35,10 +38,16 @@ public class WcScreen {
         arenaTab.setClosable(false);
         concertTab.setClosable(false);
 
+
+
         // Lägg till flikarna i TabPane
         tabPane.getTabs().addAll(wcTab, arenaTab, concertTab);
 
-
+//        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+//            if (newTab.getText().equals("Konsert")) {
+//                updateArenaDropdownForConcerts(arenaDropDown);
+//            }
+//        });
 
     }
     //////////////////////////////////////      WC TAB     //////////////////////////////////////
@@ -291,7 +300,7 @@ public class WcScreen {
         hbox3.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
 
         // Textfields
-        ComboBox<String> arenaDropDown = new ComboBox<>();
+        ComboBox<String> arenaDropDown = new ComboBox<>(arenaObservableList);
         arenaDropDown.setMinWidth(100);
         arenaDropDown.setMinHeight(30);
         arenaDropDown.setStyle("-fx-background-color: white; -fx-font-size: 14");
@@ -330,7 +339,7 @@ public class WcScreen {
         // Fyller listan med arena info och lägger till en ny
         ArenaDAO arenaDAO = new ArenaDAO();
         List<Arena> arenas = arenaDAO.getAllArenas();
-        arenaDropDown.getItems().add(" ");
+        arenaDropDown.getItems().add("- Lägg till ny arena -");
         for (Arena a : arenas) {
             arenaDropDown.getItems().add(a.getName());
         }
@@ -388,7 +397,7 @@ public class WcScreen {
                 newarenaDAO.saveArena(arena);
 
                 showAlert("GREAT SUCCESS!", "✅ GREAT SUCCESS! ✅ \nArenan har lagts till i databasen!", Alert.AlertType.INFORMATION);
-                updateArenaDropdown(arenaDropDown);
+                updateArenaObservableList();
 
             } catch (NumberFormatException e) {
                 showAlert("Fel", "Postnummer måste vara siffror!", Alert.AlertType.ERROR);
@@ -471,6 +480,7 @@ public class WcScreen {
         removeButton.setMinHeight(30);
         removeButton.setOnAction(event -> {
             String selectedArena = arenaDropDown.getValue();
+            Arena thisArena = arenaDAO.getArenaByArenaName(selectedArena);
 
             // Kollar att en arena är vald
             if(selectedArena == null || selectedArena.equals("- Lägg till ny arena -")) {
@@ -478,7 +488,17 @@ public class WcScreen {
                 return;
             }
 
-            Arena thisArena = arenaDAO.getArenaByArenaName(selectedArena);
+            ConcertDAO concertDAO = new ConcertDAO();
+            long count = concertDAO.countConcertsForArena(thisArena.getId());
+            if (count > 0) {
+                // Visa ett felmeddelande: Arenan har bokade konserter, och kan inte tas bort.
+                showAlert("Fel", "Kan inte ta bort arenan, den används i " + count + " konserter!", Alert.AlertType.ERROR);
+                return;
+            }
+
+
+
+
 
             Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
             confirmAlert.setTitle("Bekräfta radering");
@@ -591,23 +611,41 @@ public class WcScreen {
         hbox3.setSpacing(10); // Sätter ett mellanrum mellan VBox-arna
 
 
-        // Lägg till labels
-//        Label radioBtnLabel = new Label("Markera för inomhuskonsert");
-
         // Textfields
-        ComboBox<String> concertDropDown = new ComboBox<>();
+        ComboBox<Concerts> concertDropDown = new ComboBox<>();
         concertDropDown.setMinWidth(100);
         concertDropDown.setMinHeight(30);
         concertDropDown.setStyle("-fx-background-color: white; -fx-font-size: 14");
         concertDropDown.setPromptText("Välj befintlig konsert...");
         concertDropDown.setStyle("-fx-max-width: 300px;");
 
-        //ComboBox<String> arenaDropDown = new ComboBox<>();
+        // Sätt en converter så att vi kan visa t.ex. "Artist (Datum)"
+        concertDropDown.setConverter(new StringConverter<Concerts>() {
+            @Override
+            public String toString(Concerts concert) {
+                if (concert == null) {
+                    return "";
+                }
+                // Om vi har en dummy-post, visa den texten direkt
+                if (concert.getId() == 0) {
+                    return concert.getArtist_name();
+                }
+                return concert.getArtist_name() + " (" + concert.getDate() + ")";
+            }
+            @Override
+            public Concerts fromString(String string) {
+                return null; // Används inte
+            }
+        });
+
+
+        ComboBox<String> arenaDropDown = new ComboBox<>(arenaObservableList);
         arenaDropDown.setMinWidth(100);
         arenaDropDown.setMinHeight(30);
         arenaDropDown.setStyle("-fx-background-color: white; -fx-font-size: 14");
         arenaDropDown.setPromptText("Välj arena...");
         arenaDropDown.setStyle("-fx-max-width: 300px;");
+        ArenaDAO arenaDAO = new ArenaDAO();
 
         TextField artistNameField = new TextField();
         artistNameField.setPromptText("Ange artist...");
@@ -626,24 +664,22 @@ public class WcScreen {
         concertMinAgeField.setStyle("-fx-max-width: 300px;");
 
 
-        // Lägg till radiobutton
-        RadioButton inDoorBtn = new RadioButton("Markera för inomhuskonsert");
-        inDoorBtn.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;");
-        inDoorBtn.setSelected(true);
-
-
         // LOGIK
-        // Fyller konserter i dropdown, lägger till en tom som har tomma fält
+        // Skapa en dummy-post för "Lägg till ny konsert"
+        Concerts newConcertPlaceholder = new Concerts();
+        newConcertPlaceholder.setId(0); // 0 indikerar dummy
+        newConcertPlaceholder.setArtist_name("- Lägg till ny konsert -");
+
+        // Hämta listan med konserter från databasen
         ConcertDAO concertDAO = new ConcertDAO();
         List<Concerts> concerts = concertDAO.getAllConcerts();
-        concertDropDown.getItems().add("- Lägg till ny konsert -");
-        for (Concerts c : concerts) {
-            concertDropDown.getItems().add(c.getArtist_name());
-        }
+        // Lägg först in dummy-posten
+        concertDropDown.getItems().add(newConcertPlaceholder);
+        // Lägg därefter in övriga konserter
+        concertDropDown.getItems().addAll(concerts);
 
-        updateArenaDropdown(arenaDropDown);
-        // Fyller arenor i dropdownen
-        ArenaDAO arenaDAO = new ArenaDAO();
+        updateArenaDropdownForConcerts(arenaDropDown);
+
 
 
         //LOGGA UT - knapp
@@ -696,17 +732,17 @@ public class WcScreen {
                 concertDAO.saveConcert(newConcert);
 
 
-                // Uppdatera dropdown-listan
-                concertDropDown.getItems().add(newConcert.getArtist_name());
+                // Lägg till den nya konserten i dropdownen och välj den
+                concertDropDown.getItems().add(newConcert);
+                concertDropDown.getSelectionModel().select(newConcert);
 
                 // Återställ fälten efter att konserten lagts till
                 artistNameField.clear();
                 concertDateField.clear();
                 concertPriceField.clear();
                 concertMinAgeField.clear();
-                inDoorBtn.setSelected(true);
                 arenaDropDown.getSelectionModel().clearSelection();
-
+                updateArenaObservableList();
                 showAlert("GREAT SUCCESS!", "✅ GREAT SUCCESS! ✅ " +
                         "\nBorat har lagt till konserten i databasen!", Alert.AlertType.INFORMATION);
 
@@ -722,11 +758,9 @@ public class WcScreen {
         updateButton.setMinWidth(100);
         updateButton.setMinHeight(30);
         updateButton.setOnAction(event -> {
-            System.out.println("🟢 Uppdateringsknappen klickad!");
-            String selectedArtist = concertDropDown.getValue();
-
-            if (selectedArtist != null && selectedArtist.equals("- Lägg till ny konsert -")) {
-                showAlert("Fel", "Välj en konsert att uppdatera!", Alert.AlertType.ERROR);
+            Concerts selectedConcert = concertDropDown.getSelectionModel().getSelectedItem();
+            if (selectedConcert == null || selectedConcert.getId() == 0) {
+                showAlert("Fel", "Välj en giltig konsert att uppdatera!", Alert.AlertType.ERROR);
                 return;
             }
 
@@ -736,7 +770,6 @@ public class WcScreen {
             String concertDate = concertDateField.getText().trim();
             String concertPriceText = concertPriceField.getText().trim();
             String concertMinAgeText = concertMinAgeField.getText().trim();
-            boolean IsIndoor = inDoorBtn.isSelected();
 
             // Kontroll att inget fält är tomt
             if (artistName.isEmpty() || selectedArenaName .isEmpty() || concertDate.isEmpty() ||
@@ -749,13 +782,6 @@ public class WcScreen {
                 //Konvertera numeriska fält
                 double concertPrice = Double.parseDouble(concertPriceText);
                 int concertMinAge = Integer.parseInt(concertMinAgeText);
-
-                // hämta vald konsert från DB
-                Concerts selectedConcert = concertDAO.getConcertByArtist(selectedArtist);
-                if (selectedConcert == null) {
-                    showAlert("Fel", "Vald arena hittades inte!", Alert.AlertType.ERROR);
-                    return;
-                }
 
 
                 // Hämta vald arena från DB
@@ -775,9 +801,8 @@ public class WcScreen {
 
                 //spara uppdateringen i databasen
                 concertDAO.updateConcerts(selectedConcert);
-                //uppdatera dropdownlistan så att det nya namnet visas
-                concertDropDown.getItems().set(concertDropDown.getSelectionModel().getSelectedIndex(), artistName);
-                concertDropDown.getSelectionModel().select(artistName); // Sätter den till den nya
+                // Sätt om vald konsert för att uppdatera displayen
+                concertDropDown.getSelectionModel().select(selectedConcert);
 
                 showAlert("Uppdaterad!", " ✅ GREAT SUCCESS! ✅ \n Borat har uppdaterat konserten för artisten: " + selectedConcert.getArtist_name() +".", Alert.AlertType.INFORMATION);
 
@@ -797,20 +822,14 @@ public class WcScreen {
         removeButton.setMinWidth(100);
         removeButton.setMinHeight(30);
         removeButton.setOnAction(event -> {
-            String selectedArtist = concertDropDown.getValue();
+            Concerts selectedConcert = concertDropDown.getSelectionModel().getSelectedItem();
 
             // Kolla att en artist är valt
-            if (selectedArtist == null || selectedArtist.equals("- Lägg till ny konsert -")) {
+            if (selectedConcert == null || selectedConcert.getId() == 0) {
                 showAlert("Fel", "Välj en konsert att ta bort!", Alert.AlertType.ERROR);
                 return;
             }
 
-            // Hämta vald konsert från databasen
-            Concerts selectedConcert = concertDAO.getConcertByArtist(selectedArtist);
-            if (selectedConcert == null) {
-                showAlert("Fel", "Konserten hittades inte i databasen!", Alert.AlertType.ERROR);
-                return;
-            }
 
             // Bekräfta radering
             Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -823,14 +842,14 @@ public class WcScreen {
                     //Ta bort konserten ur databasen
                     concertDAO.deleteConcerts(selectedConcert);
                     // ta bort fårn dropdown
-                    concertDropDown.getItems().remove(selectedArtist);
+                    concertDropDown.getItems().remove(selectedConcert);
                     // Visa nästa konsert i listan
                     if (!concertDropDown.getItems().isEmpty()) {
                         concertDropDown.getSelectionModel().selectFirst();
                     } else {
-                        // Om listan är tom, lägg tillbaka "- Lägg till ny konsert -"
-                        concertDropDown.getItems().add("- Lägg till ny konsert -");
-                        concertDropDown.getSelectionModel().select(0);
+                        // Om listan blir tom, lägg tillbaka dummy-posten
+                        concertDropDown.getItems().add(newConcertPlaceholder);
+                        concertDropDown.getSelectionModel().select(newConcertPlaceholder);
                     }
 
                     // Rensa textfälten
@@ -838,7 +857,6 @@ public class WcScreen {
                     concertDateField.clear();
                     concertPriceField.clear();
                     concertMinAgeField.clear();
-                    inDoorBtn.setSelected(true);
                     arenaDropDown.getSelectionModel().clearSelection();
                     concertDropDown.getSelectionModel().clearSelection();
 
@@ -857,34 +875,24 @@ public class WcScreen {
 
         // Uppdatera fälten efter vald konsert
         concertDropDown.setOnAction(event -> {
-            String selectedArtist = concertDropDown.getValue();
-            if("- Lägg till ny konsert -".equals(selectedArtist)) {
-                // Tömmer alla fält
+            Concerts selectedConcert = concertDropDown.getSelectionModel().getSelectedItem();
+            if (selectedConcert == null) {
+                return;
+            }
+            if (selectedConcert.getId() == 0) { // Dummy-post: rensa fälten
                 artistNameField.clear();
                 concertDateField.clear();
-                concertMinAgeField.clear();
                 concertPriceField.clear();
-                inDoorBtn.setSelected(true); // standardval att det är inomhus då
-            } else if (selectedArtist != null) {
-                Concerts selectedConcert = concertDAO.getConcertByArtist(selectedArtist);
-                if (selectedConcert != null) {
-                    // Sätt artistens namn
-                    artistNameField.setText(selectedConcert.getArtist_name());
-                    // Sätt datum
-                    concertDateField.setText(selectedConcert.getDate());
-                    //Sätt pris
-                    concertPriceField.setText(String.valueOf(selectedConcert.getTicket_price()));
-                    // sätt åldersgräns
-                    concertMinAgeField.setText(String.valueOf(selectedConcert.getAge_limit()));
-                    //Hämta arenan
-                    Arena arena = selectedConcert.getArena();
-                    if (arena != null) {
-                        arenaDropDown.setValue(arena.getName()); // sätter rätt arena
-                        inDoorBtn.setSelected(arena.isIndoor()); // sätt radiobutton baserat på indoor / outdoor
-                    }
-
+                concertMinAgeField.clear();
+                arenaDropDown.getSelectionModel().clearSelection();
+            } else {
+                artistNameField.setText(selectedConcert.getArtist_name());
+                concertDateField.setText(selectedConcert.getDate());
+                concertPriceField.setText(String.valueOf(selectedConcert.getTicket_price()));
+                concertMinAgeField.setText(String.valueOf(selectedConcert.getAge_limit()));
+                if (selectedConcert.getArena() != null) {
+                    arenaDropDown.setValue(selectedConcert.getArena().getName());
                 }
-
             }
         });
 
@@ -895,8 +903,9 @@ public class WcScreen {
 
         // Lägg till stuff i vbox1
         hbox3.getChildren().addAll(addButton, updateButton, removeButton);
-        vbox.getChildren().addAll(headerLabel, concertDropDown, arenaDropDown, artistNameField,  concertDateField, concertPriceField,
-                concertMinAgeField, inDoorBtn, hbox3);
+        vbox.getChildren().addAll(headerLabel, concertDropDown, arenaDropDown,
+                artistNameField,  concertDateField, concertPriceField,
+                concertMinAgeField, hbox3);
         hbox2.getChildren().addAll(logoutButton);
         root.getChildren().addAll(hbox2,vbox);
         return root;
@@ -927,6 +936,25 @@ public class WcScreen {
         return arenas;
     }
 
+    public List updateArenaDropdownForConcerts(ComboBox arenaDropDown) {
+        arenaDropDown.getItems().clear(); // Töm gamla värden
+
+        ArenaDAO arenaDAO = new ArenaDAO();
+        List<Arena> arenas = arenaDAO.getAllArenas(); // Hämta nya listan från DB
+        for (Arena a : arenas) {
+            arenaDropDown.getItems().add(a.getName()); // Lägg till arenans namn
+        }
+        return arenas;
+    }
+
+    public void updateArenaObservableList() {
+        arenaObservableList.clear();
+        ArenaDAO arenaDAO = new ArenaDAO();
+        List<Arena> arenas = arenaDAO.getAllArenas();
+        for (Arena a : arenas) {
+            arenaObservableList.add(a.getName());
+        }
+    }
 
 
 }
