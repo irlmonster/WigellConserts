@@ -6,7 +6,7 @@ import java.sql.*;
 public class TestFunctions {
     private static final String URL = "jdbc:mysql://localhost:3306/WigellConcertsDB";
     private static final String USER = "root";
-    private static final String PASSWORD = "root";
+    private static final String PASSWORD = "Root";
 
     public static void printAllCustomers() {
         String sql = "SELECT * FROM customers";

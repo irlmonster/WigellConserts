@@ -13,7 +13,7 @@ public class Arena {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id", nullable = false)
     private Addresses address;
 

@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,8 @@ import java.util.Map;
 public class WcScreen {
 
     private TabPane tabPane; // TabPane för alla flikar
+
+    private ComboBox<String> arenaDropDown = new ComboBox<>();
 
     public WcScreen() {
         tabPane = new TabPane();
@@ -327,10 +330,12 @@ public class WcScreen {
         // Fyller listan med arena info och lägger till en ny
         ArenaDAO arenaDAO = new ArenaDAO();
         List<Arena> arenas = arenaDAO.getAllArenas();
-        arenaDropDown.getItems().add("- Lägg till ny arena -");
+        arenaDropDown.getItems().add(" ");
         for (Arena a : arenas) {
             arenaDropDown.getItems().add(a.getName());
         }
+
+
 
 
 
@@ -340,7 +345,6 @@ public class WcScreen {
         addButton.setMinWidth(100);
         addButton.setMinHeight(30);
         addButton.setOnAction(event -> {
-            // Hämta data från fälten
             String arenaName = arenanNameField.getText().trim();
             String arenaStreet = arenanStreetField.getText().trim();
             String arenaHouseNum = arenanHouseNumField.getText().trim();
@@ -355,51 +359,42 @@ public class WcScreen {
                 return;
             }
 
-            // Kontrollera att arenan inte redan finns
-            Arena existingArena = arenaDAO.getArenaByArenaName(arenaName);
-            if (existingArena != null) {
-                showAlert("Fel", "Arenan med detta namn finns redan. Använd uppdatera för att ändra!", Alert.AlertType.ERROR);
-                return;
-            }
-
-            // Skapa en ny Addresses-instans
-            Addresses newAddress = new Addresses();
-            newAddress.setStreet(arenaStreet);
-            newAddress.setHouse_number(arenaHouseNum);
-            newAddress.setPostal_code(arenaPostal);
-            newAddress.setCity(arenaCity);
-
-
-
-
             try {
-                // Spara addressen separat (se till att din addressDAO har en metod, t.ex. saveAddress)
+
                 AddressDAO addressDAO = new AddressDAO();
-                addressDAO.saveAddress(newAddress);
 
-                // Skapar en ny arena med den nya adressen
-                Arena newArena = new Arena(arenaName, newAddress, isIndoor);
+                //kontrollerar om adressen redan är registrerad
+                Addresses address = addressDAO.findAddress(arenaStreet, arenaHouseNum, arenaPostal, arenaCity);
 
-                // Spara arenan till databasen (om cascade är konfigurerat sparas även adressen)
-                arenaDAO.saveArena(newArena);
+                //om adressen inte finns lägger vi till den i databasen
+                if (address == null) {
+                    address = new Addresses();
+                    address.setStreet(arenaStreet);
+                    address.setHouse_number(arenaHouseNum);
+                    address.setPostal_code(arenaPostal);
+                    address.setCity(arenaCity);
 
-                // Uppdatera dropdown med det nya arenanamn
-                arenaDropDown.getItems().add(newArena.getName());
+                    addressDAO.saveAddress(address);
+                }
 
-                // Återställ fälten efter sparning
-                arenanNameField.clear();
-                arenanStreetField.clear();
-                arenanHouseNumField.clear();
-                arenanPostalField.clear();
-                arenanCityField.clear();
-                inDoorBtn.setSelected(true);
-                arenaDropDown.getSelectionModel().clearSelection();
+                //skapar och sparar kund
+                Arena arena = new Arena();
+                arena.setName(arenaName);
+                arena.setAddress(address);
+                arena.setIndoor(isIndoor);
+
+
+                ArenaDAO newarenaDAO = new ArenaDAO();
+                newarenaDAO.saveArena(arena);
 
                 showAlert("GREAT SUCCESS!", "✅ GREAT SUCCESS! ✅ \nArenan har lagts till i databasen!", Alert.AlertType.INFORMATION);
+                updateArenaDropdown(arenaDropDown);
+
             } catch (NumberFormatException e) {
                 showAlert("Fel", "Postnummer måste vara siffror!", Alert.AlertType.ERROR);
             }
         });
+
 
 
 
@@ -409,6 +404,7 @@ public class WcScreen {
         updateButton.setMinHeight(30);
         updateButton.setOnAction(event -> {
             System.out.println("🟢 Uppdateringsknappen klickad!");
+            arenaDropDown.getValue();
             String selectedArena = arenaDropDown.getValue();
 
             if(selectedArena == null){
@@ -578,6 +574,7 @@ public class WcScreen {
 
     //////////////////////////////////////      CONCERT TAB     //////////////////////////////////////
     private VBox wcConcertTab() {
+
         VBox root = new VBox(20);
         root.setStyle("-fx-font-size: 12px; -fx-padding: 0 0 0 0px;");
         root.setStyle("-fx-background-color: #4682B4;");
@@ -605,7 +602,7 @@ public class WcScreen {
         concertDropDown.setPromptText("Välj befintlig konsert...");
         concertDropDown.setStyle("-fx-max-width: 300px;");
 
-        ComboBox<String> arenaDropDown = new ComboBox<>();
+        //ComboBox<String> arenaDropDown = new ComboBox<>();
         arenaDropDown.setMinWidth(100);
         arenaDropDown.setMinHeight(30);
         arenaDropDown.setStyle("-fx-background-color: white; -fx-font-size: 14");
@@ -644,12 +641,9 @@ public class WcScreen {
             concertDropDown.getItems().add(c.getArtist_name());
         }
 
+        updateArenaDropdown(arenaDropDown);
         // Fyller arenor i dropdownen
         ArenaDAO arenaDAO = new ArenaDAO();
-        List<Arena> arenas = arenaDAO.getAllArenas();
-        for (Arena a : arenas) {
-            arenaDropDown.getItems().add(a.getName());
-        }
 
 
         //LOGGA UT - knapp
@@ -921,5 +915,18 @@ public class WcScreen {
         alert.setContentText(message);
         alert.showAndWait();
     }
+    public List updateArenaDropdown(ComboBox arenaDropDown) {
+        arenaDropDown.getItems().clear(); // Töm gamla värden
+        arenaDropDown.getItems().add("- Lägg till ny arena -"); // Lägg till default-val
+
+        ArenaDAO arenaDAO = new ArenaDAO();
+        List<Arena> arenas = arenaDAO.getAllArenas(); // Hämta nya listan från DB
+        for (Arena a : arenas) {
+            arenaDropDown.getItems().add(a.getName()); // Lägg till arenans namn
+        }
+        return arenas;
+    }
+
+
 
 }
