@@ -1,8 +1,8 @@
-package com.grp5.entitys;
+package com.grp5;
 import DAOklasser.AddressDAO;
 import DAOklasser.CustomerDAO;
-import DAOklasser.WcDAO;
-import java.sql.*;
+import com.grp5.entitys.Addresses;
+import com.grp5.entitys.Customer;
 
 public class CustomerManager {
 
@@ -10,8 +10,6 @@ public class CustomerManager {
     public void registerUser(String firstName, String lastName, String birthDate, String phoneNumber,
                              String street, String houseNumber, String postalCode, String city) {
         try {
-
-
             AddressDAO addressDAO = new AddressDAO();
 
             //kontrollerar om adressen redan är registrerad
@@ -36,11 +34,12 @@ public class CustomerManager {
             customer.setPhoneNumber(phoneNumber);
             customer.setAddress(address);
 
+            System.out.println(customer);
+            System.out.println("\n" + address);
+
             CustomerDAO customerDAO = new CustomerDAO();
             customerDAO.saveCustomer(customer);
 
-
-            TestFunctions.printAllCustomers();
 
 
         } catch (Exception e) {

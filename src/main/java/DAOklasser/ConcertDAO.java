@@ -23,7 +23,7 @@ public class ConcertDAO {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.save(concert);
+            session.persist(concert);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -54,6 +54,29 @@ public class ConcertDAO {
             e.printStackTrace();
             System.out.println("Ingen konsert hittades");
             return null; // returnerar null om ingen konsert hittades
+        }
+    }
+
+    // Hämta en konsert baserat på concertId
+    public Concerts getConcertById(int id) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery(
+                            "FROM Concerts c JOIN FETCH c.arena a JOIN FETCH a.address ad WHERE c.id = :id", Concerts.class)
+                    .setParameter("id", id)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // kollar hur många konserter som är bokade på en arena
+    // I ConcertDAO
+    public long countConcertsForArena(int arenaId) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("SELECT COUNT(c) FROM Concerts c WHERE c.arena.id = :arenaId", Long.class)
+                    .setParameter("arenaId", arenaId)
+                    .uniqueResult();
         }
     }
 

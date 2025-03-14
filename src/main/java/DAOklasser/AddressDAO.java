@@ -18,7 +18,7 @@ public class AddressDAO {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.save(addresses);
+            session.persist(addresses);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {

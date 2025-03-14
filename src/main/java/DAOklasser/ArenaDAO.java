@@ -1,6 +1,7 @@
 package DAOklasser;
 
 import com.grp5.entitys.Arena;
+import com.grp5.entitys.Customer;
 import org.hibernate.Session;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
@@ -14,18 +15,18 @@ import java.util.List;
 
 
 public class ArenaDAO {
-    private static SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+    private final SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
-    //Create - lägga till ny arena
+
     public void saveArena(Arena arena) {
         Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()){
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.save(arena);
+            session.persist(arena);
             transaction.commit();
-        } catch(Exception e) {
-            if(transaction != null) {
-                transaction.rollback();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();     // rollback ångrar alla ändringar om något gått fel
             }
             e.printStackTrace();
         }
@@ -76,16 +77,16 @@ public class ArenaDAO {
     }
 
     //Update - uppdatera arena/info
-    public void updateArena(Arena arena){
+    public void updateArena(Arena arena) {
         Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()){
+        try (Session session = sessionFactory.openSession()) { // session skapas och stängs automatiskt
             transaction = session.beginTransaction();
             session.update(arena);
             transaction.commit();
-            System.out.println("Arenan har lagts till✅");
+            System.out.println("Arenan har uppdaterats✅");
         } catch (Exception e) {
             if (transaction != null) {
-                transaction.rollback();
+                transaction.rollback(); // rollback fungerar fortfarande
             }
             e.printStackTrace();
         }

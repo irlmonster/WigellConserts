@@ -1,5 +1,6 @@
 package DAOklasser;
 
+import com.grp5.entitys.Arena;
 import com.grp5.entitys.Concerts;
 import com.grp5.entitys.Customer;
 import org.hibernate.Session;
@@ -8,7 +9,8 @@ import org.hibernate.Transaction;
 import com.grp5.entitys.WC;
 import org.hibernate.cfg.Configuration;
 
-import java.util.List;
+
+import java.util.*;
 
 
 public class WcDAO {
@@ -41,7 +43,7 @@ public class WcDAO {
             System.out.println("Konsert-ID: " + (wc.getConcert() != null ? wc.getConcert().getId() : "null"));
             System.out.println("Kund-ID: " + (wc.getCustomer() != null ? wc.getCustomer().getId() : "null"));
 
-            session.save(wc);
+            session.persist(wc);
             tx.commit();
             System.out.println("Biljett sparad: " + wc);
 
@@ -75,17 +77,43 @@ public class WcDAO {
         }
     }
 
+    // hämta bokningar från kund till vald koncert
+    public Map<Customer, Long> getTicketCountsForConcert(Concerts concert) {
+        Map<Customer, Long> ticketsMap = new HashMap<>();
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
 
+            List<Object[]> resultList = session.createQuery(
+                            "SELECT wc.customer, COUNT(wc) " +
+                                    "FROM WC wc " +
+                                    "WHERE wc.concert.id = :concertId " +
+                                    "GROUP BY wc.customer", Object[].class)
+                    .setParameter("concertId", concert.getId())
+                    .getResultList();
 
+            for (Object[] row : resultList) {
+                Customer customer = (Customer) row[0];
+                Long count = (Long) row[1];
+                ticketsMap.put(customer, count);
+            }
+
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+        return ticketsMap;
+    }
 
     // UPDATE
-    public void updateCustomer(Customer customer) {
+    public void updateArena(Arena arena) {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.merge(customer); //MERGE istället för update?
+            session.merge(arena); //MERGE istället för update?
             transaction.commit();
-            System.out.println("Kunden har sparats");
+            System.out.println("Arenan har uppdaterats");
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();     // rollback ångrar alla ändringar om något gått fel
@@ -94,20 +122,17 @@ public class WcDAO {
         }
     }
 
-
-
     // DELETE
-    public void deleteTicketWC(WC wc) {
+    public void deleteTicketsForCustomerAndConcert(Customer customer, Concerts concert) {
         Transaction tx = null;
         try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
-            if (wc != null) {
-                session.remove(wc);  // Tar bort WC-objektet från databasen
-                System.out.println("Biljett med id " + wc.getId() + " har tagits bort!");
-            } else {
-                System.out.println("Hittade ingen biljett att ta bort.");
-            }
+            int deletedCount = session.createQuery("DELETE FROM WC WHERE customer.id = :customerId AND concert.id = :concertId")
+                    .setParameter("customerId", customer.getId())
+                    .setParameter("concertId", concert.getId())
+                    .executeUpdate();
             tx.commit();
+            System.out.println("Antal biljetter borttagna för kund " + customer.getId() + " och konsert " + concert.getId() + ": " + deletedCount);
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             e.printStackTrace();
@@ -143,7 +168,5 @@ public class WcDAO {
             e.printStackTrace();
         }
     }
-
-
 
 }

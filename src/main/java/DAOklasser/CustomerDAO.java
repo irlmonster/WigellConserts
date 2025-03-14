@@ -1,5 +1,6 @@
 package DAOklasser;
 
+import com.grp5.Booking;
 import com.grp5.entitys.Addresses;
 import com.grp5.entitys.Concerts;
 import com.grp5.entitys.Customer;
@@ -20,7 +21,7 @@ public class CustomerDAO {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.save(customer);
+            session.persist(customer);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -56,6 +57,7 @@ public class CustomerDAO {
         }
     }
 
+
     // UPDATE
     public void updateCustomer(Customer customer) {
         Transaction transaction = null;
@@ -71,6 +73,24 @@ public class CustomerDAO {
             e.printStackTrace();
         }
     }
+
+    // Uppdatera customer och address
+    public void updateCustomerSettings(Customer customer, Addresses address) {
+        Session session = sessionFactory.openSession();
+        try {
+            session.beginTransaction();
+            // Uppdatera adress
+            session.merge(address);
+            // Sätt adress i customer
+            customer.setAddress(address);
+            // Uppdatera customer
+            session.merge(customer);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     // DELETE
     public void deleteCustomer(Customer customer) {

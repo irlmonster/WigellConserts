@@ -4,7 +4,9 @@ import com.grp5.entitys.Concerts;
 import com.grp5.entitys.Customer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class Booking {
@@ -75,6 +77,22 @@ public class Booking {
         return customerBookings;
     }
 
+
+    // Grupperar bokningar per kund i lista
+    public static Map<Customer, Integer> getTicketsByCustomerForConcert(Concerts concert) {
+        Map<Customer, Integer> ticketsMap = new HashMap<>();
+        // Iterera över alla bokningar
+        for (Booking booking : bookings) {
+            // Om bokningens konsert matchar den valda
+            if (booking.getConcert().getId() == concert.getId()) {
+                Customer cust = booking.getCustomer();
+                int current = ticketsMap.getOrDefault(cust, 0);
+                // Lägg till antal biljetter (observera att du måste se till att detta fält är satt korrekt)
+                ticketsMap.put(cust, current + booking.getNumberOfTickets());
+            }
+        }
+        return ticketsMap;
+    }
 
 
     @Override
