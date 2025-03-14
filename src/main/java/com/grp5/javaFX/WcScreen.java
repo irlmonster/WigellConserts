@@ -24,6 +24,7 @@ public class WcScreen {
     private TabPane tabPane; // TabPane för alla flikar
     private ObservableList<String> arenaObservableList = FXCollections.observableArrayList();
     private ComboBox<String> arenaDropDown = new ComboBox<>(arenaObservableList);
+    private ComboBox<Concerts> concertDropdown;
 
     public WcScreen() {
         tabPane = new TabPane();
@@ -36,6 +37,8 @@ public class WcScreen {
         wcTab.setClosable(false);
         arenaTab.setClosable(false);
         concertTab.setClosable(false);
+
+
 
         // Lägg till flikarna i TabPane
         tabPane.getTabs().addAll(wcTab, arenaTab, concertTab);
@@ -245,9 +248,6 @@ public class WcScreen {
         });
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////      CUSTOMER INFO     //////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
         Button logoutButton = new Button("Logga ut");
         logoutButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
         logoutButton.setMinWidth(100);
@@ -776,11 +776,11 @@ public class WcScreen {
                 concertDAO.updateConcerts(selectedConcert);
                 // Sätt om vald konsert för att uppdatera displayen
                 concertDropDown.getSelectionModel().select(selectedConcert);
-
+                updateDropdownConcerts(concertDropDown);
                 showAlert("Uppdaterad!", " ✅ GREAT SUCCESS! ✅ " +
                         "\n Borat har uppdaterat konserten för artisten: " + selectedConcert.getArtist_name() +".", Alert.AlertType.INFORMATION);
 
-
+                updateDropdownConcerts(concertDropDown);
             } catch (NumberFormatException e) {
                 showAlert("Fel", "Pris och åldersgräns måste vara siffror!", Alert.AlertType.ERROR);
             }
@@ -831,7 +831,7 @@ public class WcScreen {
                     concertMinAgeField.clear();
                     arenaDropDown.getSelectionModel().clearSelection();
                     concertDropDown.getSelectionModel().clearSelection();
-
+                    updateDropdownConcerts(concertDropDown);
                     showAlert("Borttagen!", "✅ Borat kröp in i databasen och slet ut artisten " + selectedConcert.getArtist_name()
                             + " ✅\nPOFF, GONE!!", Alert.AlertType.INFORMATION);
                 }
@@ -888,17 +888,6 @@ public class WcScreen {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    public List updateArenaDropdown(ComboBox arenaDropDown) {
-        arenaDropDown.getItems().clear(); // Töm gamla värden
-        arenaDropDown.getItems().add("- Lägg till ny arena -"); // Lägg till default-val
-
-        ArenaDAO arenaDAO = new ArenaDAO();
-        List<Arena> arenas = arenaDAO.getAllArenas(); // Hämta nya listan från DB
-        for (Arena a : arenas) {
-            arenaDropDown.getItems().add(a.getName()); // Lägg till arenans namn
-        }
-        return arenas;
-    }
 
     public List updateArenaDropdownForConcerts(ComboBox arenaDropDown) {
         arenaDropDown.getItems().clear(); // Töm gamla värden
@@ -920,5 +909,15 @@ public class WcScreen {
         }
     }
 
+
+    public List updateDropdownConcerts(ComboBox concertDropdown) {
+        concertDropdown.getItems().clear(); // Töm gamla värden
+        ConcertDAO concertDAO = new ConcertDAO();
+        List<Concerts> concerts = concertDAO.getAllConcerts(); // Hämta nya listan från DB
+        for (Concerts c : concerts) {
+            concertDropdown.getItems().add(c); // Lägg till konsertens namn
+        }
+        return concerts;
+    }
 
 }

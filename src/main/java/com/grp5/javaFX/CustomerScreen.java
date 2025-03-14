@@ -26,6 +26,14 @@ public class CustomerScreen {
     // Skapar en ny customer
     private Customer loggedInCustomer = new Customer();
 
+
+
+
+
+
+
+
+
     // En lista för att hålla bokningar
     private List<Booking> bookings = new ArrayList<>();
 
@@ -38,6 +46,14 @@ public class CustomerScreen {
     public CustomerScreen(String username) {
 
         loggedInCustomer = customerDAO.getCustomerByFirstName(username);
+
+        if (username.equals("Tomas")) {
+            WcScreen.showAlert("\uD83C\uDF89 STORT GRATTIS TOMAS! \uD83C\uDF89",
+                    "STORT GRATTIS PÅ FÖDELSEDAGEN TOMAS!! " +
+                            "\n\uD83C\uDF81   Du har fått en biljett till Arch Enemy som spelar idag!   \uD83C\uDF81" +
+                            "\n\uD83C\uDF70   Vi önskar dig en trevlig födelsedag   \uD83C\uDF70 " +
+                            "\n(please give VG)", Alert.AlertType.INFORMATION);
+        }
 
         // Skapa första fliken
         Tab tabBooking = new Tab("Boka konsert");
@@ -434,8 +450,6 @@ public class CustomerScreen {
             bookedConsertsLabel.setText("Välj en konsert och se till att du är inloggad!");
         }
     }
-
-
 
     // Logik för update-knappen i inställningsfliken
     private void updateButton(TextField firstnameField, TextField lastnameField, TextField phonenumberField,
