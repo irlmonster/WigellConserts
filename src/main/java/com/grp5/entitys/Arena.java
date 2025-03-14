@@ -1,21 +1,32 @@
 package com.grp5.entitys;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "arena")
 public class Arena {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "name", nullable = false)
     private String name;
-    private String address;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id", nullable = false)
+    private Addresses address;
+
+    @Column(name = "indoor", nullable = false)
     private boolean indoor;
 
-    public Arena(){
+    public Arena() {
+    }
+
+    public Arena(String name, Addresses address, boolean indoor) {
+        this.name = name;
+        this.address = address;
+        this.indoor = indoor;
     }
 
     public int getId() {
@@ -34,11 +45,11 @@ public class Arena {
         this.name = name;
     }
 
-    public String getAddress() {
+    public Addresses getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(Addresses address) {
         this.address = address;
     }
 
@@ -55,7 +66,7 @@ public class Arena {
         return "Arena{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", address='" + address + '\'' +
+                ", address=" + address +
                 ", indoor=" + indoor +
                 '}';
     }

@@ -2,22 +2,26 @@ package com.grp5.entitys;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
+@Table(name = "wigells_concert")
 public class WC {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(nullable = false) // Gör så att namnet aldrig kan vara null i databasen
     private String name;
 
-    @OneToMany()
-    private List<Concerts> conserts;
+    @ManyToOne
+    @JoinColumn(name = "concerts", referencedColumnName = "id", nullable = false)
+    private Concerts concert;
 
-    @OneToMany
-    private List<Customer> customers;
+    @ManyToOne
+    @JoinColumn(name = "customers", referencedColumnName = "id", nullable = false)
+    private Customer customer;
 
+    // Getters och Setters
     public int getId() {
         return id;
     }
@@ -34,20 +38,20 @@ public class WC {
         this.name = name;
     }
 
-    public List<Concerts> getConserts() {
-        return conserts;
+    public Concerts getConcert() {
+        return concert;
     }
 
-    public void setConserts(List<Concerts> conserts) {
-        this.conserts = conserts;
+    public void setConcert(Concerts concert) {
+        this.concert = concert;
     }
 
-    public List<Customer> getCustomers() {
-        return customers;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setCustomers(List<Customer> customers) {
-        this.customers = customers;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
     @Override
@@ -55,8 +59,8 @@ public class WC {
         return "WC{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", conserts=" + conserts +
-                ", customers=" + customers +
+                ", concert=" + concert +
+                ", customer=" + customer +
                 '}';
     }
 }

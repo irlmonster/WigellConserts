@@ -1,0 +1,490 @@
+package com.grp5.javaFX;
+
+import DAOklasser.*;
+import com.grp5.Booking;
+import com.grp5.entitys.*;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import org.hibernate.Session;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+
+//Skriver detta för att kunna commita klassen
+public class CustomerScreen {
+    // Skapa TabPane (flikbehållare)
+    private TabPane tabPane = new TabPane();
+
+    // Skapar en ny customer
+    private Customer loggedInCustomer = new Customer();
+
+
+
+
+
+
+
+
+
+    // En lista för att hålla bokningar
+    private List<Booking> bookings = new ArrayList<>();
+
+    public TabPane getTabPane() {
+        return tabPane;
+    }
+    // Behövs för uppdatering av inställningar
+    CustomerDAO customerDAO = new CustomerDAO();
+
+    public CustomerScreen(String username) {
+
+        loggedInCustomer = customerDAO.getCustomerByFirstName(username);
+
+        if (username.equals("Tomas")) {
+            WcScreen.showAlert("\uD83C\uDF89 STORT GRATTIS TOMAS! \uD83C\uDF89",
+                    "STORT GRATTIS PÅ FÖDELSEDAGEN TOMAS!! " +
+                            "\n\uD83C\uDF81   Du har fått en biljett till Arch Enemy som spelar idag!   \uD83C\uDF81" +
+                            "\n\uD83C\uDF70   Vi önskar dig en trevlig födelsedag   \uD83C\uDF70 " +
+                            "\n(please give VG)", Alert.AlertType.INFORMATION);
+        }
+
+        // Skapa första fliken
+        Tab tabBooking = new Tab("Boka konsert");
+        tabBooking.setClosable(false); // Gör så att användaren inte kan stänga fliken
+        tabBooking.setStyle("-fx-font-size: 16px;");
+
+        ComboBox comboBoxConcert = new ComboBox();
+        comboBoxConcert.setPromptText("Konsert");
+        comboBoxConcert.setMinWidth(100);
+        comboBoxConcert.setMinHeight(30);
+        comboBoxConcert.setStyle("-fx-background-color: white; -fx-font-size: 14");
+
+        TextField textFieldTickets = new TextField();
+        textFieldTickets.setPromptText("Antal biljetter");
+        textFieldTickets.setStyle("-fx-font-size: 14px;");
+        textFieldTickets.setMaxWidth(120);
+        textFieldTickets.setMinHeight(30);
+
+        Label labelTotal = new Label("Totalt");
+        labelTotal.setStyle("-fx-text-fill: white; -fx-font-size: 18");
+        labelTotal.setMinWidth(60);
+
+        TextField textTotalSum = new TextField();
+        textTotalSum.setPromptText("Totalsumma");
+        textTotalSum.setStyle("-fx-font-size: 14px;");
+        textTotalSum.setEditable(false);
+        textTotalSum.setMaxWidth(120);
+        textTotalSum.setMinHeight(30);
+
+        Label label = new Label("kronor");
+        label.setStyle("-fx-text-fill: white; -fx-font-size: 18");
+        label.setMinWidth(60);
+
+        Label customerLabel = new Label("Inloggad användare: ");
+        customerLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+        label.setMinWidth(60);
+
+        Label inloggedCustomerLabel = new Label("");
+        inloggedCustomerLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+        inloggedCustomerLabel.setText(loggedInCustomer.getFirstName());
+
+        // Visar lista med bokade konserter
+        Label bookedConsertsHeaderLabel = new Label("");
+        bookedConsertsHeaderLabel.setStyle("-fx-text-fill: white; -fx-font-size: 18");
+        Label bookedConsertsLabel = new Label("");
+        bookedConsertsLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16");
+
+        Button btnBookConcert = new Button("Boka konsert");
+        btnBookConcert.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        btnBookConcert.setMinWidth(100);
+        btnBookConcert.setMinHeight(30);
+
+        Button btnShowBookings = new Button("Visa bokningar");
+        btnShowBookings.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        btnShowBookings.setMinWidth(100);
+        btnShowBookings.setMinHeight(30);
+
+        // Utloggningsknapp
+        Button logoutButton = new Button("Logga ut");
+        logoutButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        logoutButton.setOnAction(event -> {
+            FxManager fxManager = new FxManager((Stage) logoutButton.getScene().getWindow());
+            fxManager.showLoginScreen();
+        });
+
+
+
+
+
+
+        //för att lägga till konserter i comboboxen
+        ConcertDAO concertDAO = new ConcertDAO();
+        List<Concerts> concerts = concertDAO.getAllConcerts();
+        for (Concerts concert : concerts) {
+            comboBoxConcert.getItems().add(concert);
+        }
+
+        textFieldTickets.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Uppdatera totalpriset när texten i textfältet ändras
+            double totalAmount = calculateTotalSum(textFieldTickets, comboBoxConcert);
+            textTotalSum.setText(String.format("%.2f", totalAmount));  // Uppdatera med två decimaler
+        });
+
+        // Hantera att användaren väljer en konsert och beräkna totalsumman med metoden calculateTotalSum
+        comboBoxConcert.setOnAction(e -> {
+            String selectedConcert = comboBoxConcert.getSelectionModel().getSelectedItem().toString();
+            double totalAmount = calculateTotalSum(textFieldTickets, comboBoxConcert);
+            textTotalSum.setText(String.format("%.2f", totalAmount));
+        });
+        /// ////////////////////BOKA KONCERT KNAPP////////////////////////////////////////////////////////////////////////
+        btnBookConcert.setOnAction(e -> {
+            // Kontrollera att en konsert är vald
+            Concerts selectedConcert = (Concerts) comboBoxConcert.getSelectionModel().getSelectedItem();
+            if (selectedConcert == null) {
+                System.out.println("Vänligen välj en konsert.");
+                return;
+            }
+
+            // Hämta ID från den valda konserten och den inloggade kunden
+            int selectedConcertId = selectedConcert.getId();
+            int loggedInCustomerId = loggedInCustomer.getId();
+
+            // Anropa metoden med dessa ID:n
+
+            bookConcert(selectedConcertId, loggedInCustomerId, textFieldTickets);
+
+            // Återställ fälten efter sparning
+            textFieldTickets.clear();
+        });
+
+        btnShowBookings.setOnAction(e -> {
+            showBookingsInLabel(bookedConsertsLabel);
+        });
+
+        HBox logOutbox = new HBox(10);
+        logOutbox.setPadding(new Insets(0, 20, 0, 450)); // (top, right, bottom, left)
+        logOutbox.getChildren().addAll(logoutButton);
+
+
+        HBox customerHbox = new HBox();
+        customerHbox.getChildren().addAll(customerLabel, inloggedCustomerLabel, logOutbox);
+        customerHbox.setAlignment(Pos.TOP_CENTER);
+
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.TOP_CENTER);
+        hBox.setSpacing(20);
+        hBox.setMaxWidth(600);
+        hBox.getChildren().addAll(comboBoxConcert, textFieldTickets, labelTotal, textTotalSum, label);
+
+        HBox hBox2 = new HBox(20);
+        hBox2.setAlignment(Pos.CENTER_RIGHT);
+        hBox2.setMaxWidth(560);
+        hBox2.getChildren().addAll(bookedConsertsHeaderLabel, bookedConsertsLabel, btnShowBookings, btnBookConcert);
+
+        VBox vBox = new VBox();
+        vBox.setSpacing(50);
+        vBox.setStyle("-fx-background-color: #4682B4");
+        vBox.setAlignment(Pos.TOP_CENTER);
+        vBox.getChildren().addAll(customerHbox, hBox, hBox2);
+
+        tabBooking.setContent(vBox);
+
+        Tab tabSettings = new Tab("Inställningar");
+        tabSettings.setClosable(false);
+        tabSettings.setStyle("-fx-font-size: 16px;");
+
+
+        Tab tabTravel = new Tab("Konsertresor");
+        tabTravel.setClosable(false);
+        tabTravel.setStyle("-fx-font-size: 16px;");
+        tabTravel.setContent(tabTravel()); // Lägg till innehåll i fliken
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////        INSTÄLLNINGAR      /////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////
+
+        // Innehållet för inställningar (från andra koden)
+        Label updateSettingsLabel = new Label("Uppdatera personlig information nedan:");
+        updateSettingsLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
+
+        TextField firstnameField = new TextField();
+        firstnameField.setPromptText("Ange förnamn...");
+        firstnameField.setStyle("-fx-max-width: 300px;");
+
+        TextField lastnameField = new TextField();
+        lastnameField.setPromptText("Ange efternamn...");
+        lastnameField.setStyle("-fx-max-width: 300px;");
+
+        TextField phonenumberField = new TextField();
+        phonenumberField.setPromptText("Ange telefonnummer...");
+        phonenumberField.setStyle("-fx-max-width: 300px;");
+
+        TextField streetField = new TextField();
+        streetField.setPromptText("Ange gata...");
+        streetField.setStyle("-fx-max-width: 300px;");
+
+        TextField houseNumberField = new TextField();
+        houseNumberField.setPromptText("Ange husnummer...");
+        houseNumberField.setStyle("-fx-max-width: 300px;");
+
+        TextField postalCodeField = new TextField();
+        postalCodeField.setPromptText("Ange postnummer...");
+        postalCodeField.setStyle("-fx-max-width: 300px;");
+
+        TextField cityField = new TextField();
+        cityField.setPromptText("Ange stad...");
+        cityField.setStyle("-fx-max-width: 300px;");
+
+        Button updateButton = new Button("Uppdatera");
+        updateButton.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+
+        // Ta bort kundknapp
+        Button deleteCstmrBtn = new Button("Ta bort användare");
+        deleteCstmrBtn.setStyle("-fx-background-color: white; -fx-font-size: 14px;");
+        deleteCstmrBtn.setOnAction(event -> {
+            customerDAO.deleteCustomer(loggedInCustomer);
+            WcScreen.showAlert("DELETE!", " ✅ HIGH FIVE! ✅ " +
+                    "\nBorat har tagit bort användaren!", Alert.AlertType.INFORMATION);
+            FxManager fxManager = new FxManager((Stage) logoutButton.getScene().getWindow());
+            fxManager.showLoginScreen();
+        });
+
+
+        // Populera fälten med kunddata
+        firstnameField.setText(loggedInCustomer.getFirstName());
+        lastnameField.setText(loggedInCustomer.getLastName());
+        phonenumberField.setText(loggedInCustomer.getPhoneNumber());
+
+        Addresses customerAddress = loggedInCustomer.getAddress();
+        if (customerAddress != null) {
+            streetField.setText(customerAddress.getStreet());
+            houseNumberField.setText(customerAddress.getHouse_number());
+            postalCodeField.setText(customerAddress.getPostal_code());
+            cityField.setText(customerAddress.getCity());
+        }
+
+        updateButton.setOnAction(e -> {
+            updateButton(firstnameField, lastnameField, phonenumberField, streetField, houseNumberField, postalCodeField, cityField);
+        });
+
+        HBox hbox3 = new HBox(10);
+        hbox3.setAlignment(Pos.CENTER);
+
+        VBox vbox2 = new VBox(10);
+        vbox2.setStyle("-fx-padding: 60 0 0 0px;");
+        vbox2.setAlignment(Pos.CENTER);
+
+        VBox settingsRoot = new VBox(20);
+        settingsRoot.setStyle("-fx-font-size: 12px; -fx-padding: 0 0 0 0px; -fx-background-color: #4682B4;");
+
+        hbox3.getChildren().addAll(updateButton, deleteCstmrBtn);
+        vbox2.getChildren().addAll(updateSettingsLabel, firstnameField, lastnameField, phonenumberField, streetField, houseNumberField, postalCodeField, cityField, hbox3);
+        settingsRoot.getChildren().add(vbox2);
+        tabSettings.setContent(settingsRoot);
+        tabPane.getTabs().addAll(tabBooking, tabTravel, tabSettings);
+        Scene scene = new Scene(tabPane, 800, 600);
+    }
+
+    private VBox tabTravel() {
+        VBox root = new VBox(20);
+        HBox hbox = new HBox(20);
+
+        root.setStyle("-fx-background-color: #4682B4;");
+        root.setPadding(new Insets(20));
+        root.setMinHeight(400);
+        root.setMinWidth(300);
+
+        ComboBox<String> comboBoxConcert = new ComboBox<>();
+        comboBoxConcert.setPromptText("Konsert");
+        comboBoxConcert.setMinWidth(200);
+        comboBoxConcert.setMinHeight(30);
+        comboBoxConcert.setStyle("-fx-background-color: white; -fx-font-size: 14");
+
+        Label concertTrip = new Label("Annordnade resor till konserter");
+        concertTrip.setStyle("-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold;");
+
+        Label bookedConsertsLabel = new Label("");
+        bookedConsertsLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16");
+
+        // Hämta konserter från databasen
+        ConcertDAO concertDAO = new ConcertDAO();
+        List<Concerts> concerts = concertDAO.getAllConcerts();
+        for (Concerts c : concerts) {
+            comboBoxConcert.getItems().add(c.getArtist_name());
+        }
+
+        // När en konsert väljs kan du exempelvis visa namnet i en label
+        comboBoxConcert.setOnAction(event -> {
+            String selectedArtist = comboBoxConcert.getSelectionModel().getSelectedItem();
+            if (selectedArtist != null) {
+                Concerts selectedConcert = concertDAO.getConcertByArtist(selectedArtist);
+                if (selectedConcert != null) {
+                    showBusInfo(loggedInCustomer, selectedConcert, bookedConsertsLabel);
+                } else {
+                    bookedConsertsLabel.setText("Ingen konsert hittades för artist: " + selectedArtist);
+                }
+            }
+        });
+
+        hbox.getChildren().addAll(comboBoxConcert, bookedConsertsLabel);
+        root.getChildren().addAll(concertTrip, hbox);
+        return root;
+    }
+
+    private void showBookingsInLabel(Label bookedConsertsLabel) {
+        List<Booking> customerBookings = Booking.getBookingsForCustomer(loggedInCustomer);
+        if (customerBookings.isEmpty()) {
+            bookedConsertsLabel.setText("Du har inga bokningar.");
+        } else {
+            StringBuilder sb = new StringBuilder("Bokade konserter:\n");
+            for (Booking booking : customerBookings) {
+                sb.append(booking.getConcert().getArtist_name())
+                        .append(" - ")
+                        .append(booking.getNumberOfTickets())
+                        .append(" biljetter\n");
+            }
+            bookedConsertsLabel.setText(sb.toString());
+        }
+    }
+
+    public double calculateTotalSum(TextField textFieldTickets, ComboBox<Concerts> comboBoxConcert) {
+        try {
+            // Omvandlar antalet biljetter till int
+            int numberOfTickets = Integer.parseInt(textFieldTickets.getText());
+
+            // Kontrollera om textfältet är tomt
+            if(textFieldTickets.getText().isEmpty()) {
+                System.out.println("Antal biljetter är tomt");
+            }
+
+            // Kontrollera om en konsert är vald i ComboBox
+            Concerts selectedConcert = comboBoxConcert.getSelectionModel().getSelectedItem();
+            if (selectedConcert != null) {
+                // Beräkna totalbeloppet och returnera det
+                double totalAmount = numberOfTickets * selectedConcert.getTicket_price();
+                return totalAmount;
+            } else {
+                // Om ingen konsert är vald, visa ett meddelande
+                System.out.println("Vänligen välj en konsert.");
+            }
+        } catch (NumberFormatException ex) {
+            // Om användaren inte anger ett giltigt tal i textfältet
+            System.out.println("Ange ett giltigt antal biljetter.");
+        }
+        return 0; // Om något går fel, returnera 0
+    }
+
+    // Exempel i CustomerScreen.bookConcert() - anpassa efter din implementation:
+    public void bookConcert(int selectedConcertId, int loggedInCustomerId, TextField textFieldTickets) {
+        try (Session session = ConcertDAO.getSessionFactory().openSession()) {
+            // Hämta konsert och kund från databasen
+            Concerts concert = session.get(Concerts.class, selectedConcertId);
+            Customer customer = session.get(Customer.class, loggedInCustomerId);
+
+            if (concert == null || customer == null) {
+                System.out.println("Fel: Kunde inte hitta konsert eller kund i databasen.");
+                return;
+            }
+
+            // Parsar antalet biljetter från TextField
+            int numberOfTickets;
+            try {
+                numberOfTickets = Integer.parseInt(textFieldTickets.getText().trim());
+                if (numberOfTickets <= 0) {
+                    System.out.println("Antalet biljetter måste vara minst 1.");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Fel: Ange endast siffror för antal biljetter.");
+                return;
+            }
+
+
+            WcDAO wcDAO = new WcDAO();
+            for (int i = 1; i <= numberOfTickets; i++) {
+                WC newWc = new WC();
+                newWc.setConcert(concert);
+                newWc.setCustomer(customer);
+                newWc.setName("Biljett " + i + " för " + customer.getFirstName() + " till " + concert.getArtist_name());
+                wcDAO.createTicketWC(newWc);
+                System.out.println("Biljett " + i + " bokad för " + customer.getFirstName() + " till " + concert.getArtist_name());
+            }
+
+            // Skapa och spara bokningen i den statiska listan
+            Booking newBooking = new Booking(numberOfTickets, customer, concert);
+            newBooking.addBooking(newBooking);
+            System.out.println("Bokning sparad: " + newBooking);
+            System.out.println("Biljett bokad för " + customer.getFirstName() + " till " + concert.getArtist_name());
+
+            WcScreen.showAlert("GREAT SUCCESS!",
+                    "✅ GREAT SUCCESS! ✅ \nBorat har tagit emot din bokning!", Alert.AlertType.INFORMATION);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void showBusInfo(Customer loggedInCustomer, Concerts selectedConcert, Label bookedConsertsLabel) {
+        if (loggedInCustomer != null && selectedConcert != null) {
+            // Hämta staden via kundens adress
+            Addresses address = loggedInCustomer.getAddress();
+            String city = (address != null) ? address.getCity() : "Okänd stad";
+
+            // Hämta konsertnamn
+            String artistName = selectedConcert.getArtist_name();
+            String artistDate = selectedConcert.getDate();
+
+            // Skapa texten
+            String bussresa = "Från din hemstad " + city + " går en konsertbuss kl 09.00, " + artistDate +
+                    ".\nFrån centralstationen till "+ artistName + " konserten.";
+
+            // Sätt texten på labeln
+            bookedConsertsLabel.setText(bussresa);
+        } else {
+            bookedConsertsLabel.setText("Välj en konsert och se till att du är inloggad!");
+        }
+    }
+
+    // Logik för update-knappen i inställningsfliken
+    private void updateButton(TextField firstnameField, TextField lastnameField, TextField phonenumberField,
+                              TextField streetField, TextField houseNumberField, TextField postalCodeField, TextField cityField) {
+        loggedInCustomer.setFirstName(firstnameField.getText());
+        loggedInCustomer.setLastName(lastnameField.getText());
+        loggedInCustomer.setPhoneNumber(phonenumberField.getText());
+
+        Addresses address = loggedInCustomer.getAddress();
+        if (address == null) {
+            address = new Addresses();
+        }
+        address.setStreet(streetField.getText());
+        address.setHouse_number(houseNumberField.getText());
+        address.setPostal_code(postalCodeField.getText());
+        address.setCity(cityField.getText());
+        loggedInCustomer.setAddress(address);
+
+        List<String> fields = List.of(
+                firstnameField.getText(), lastnameField.getText(), phonenumberField.getText(),
+                streetField.getText(), houseNumberField.getText(), postalCodeField.getText(), cityField.getText()
+        );
+        boolean emptyField = fields.stream().anyMatch(String::isEmpty);
+        if (emptyField) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Fel!");
+            alert.setHeaderText("Alla fält måste fyllas i");
+            alert.showAndWait();
+        } else {
+            customerDAO.updateCustomerSettings(loggedInCustomer, address);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Meddelande");
+            alert.setContentText("Användare uppdaterad");
+            alert.showAndWait();
+        }
+    }
+
+}
